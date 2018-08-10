@@ -82,6 +82,7 @@
     <guava.version>20.0</guava.version>
 
     <validation.model>true</validation.model>
+    <docker-maven-plugin.version>0.26.1</docker-maven-plugin.version>
   </properties>
 
   <dependencyManagement>
