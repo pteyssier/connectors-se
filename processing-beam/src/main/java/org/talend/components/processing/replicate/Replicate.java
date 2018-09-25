@@ -12,6 +12,8 @@ import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.meta.Documentation;
 import org.talend.sdk.component.api.processor.ElementListener;
+import org.talend.sdk.component.api.processor.Output;
+import org.talend.sdk.component.api.processor.OutputEmitter;
 import org.talend.sdk.component.api.processor.Processor;
 
 import javax.json.JsonObject;
@@ -42,7 +44,8 @@ public class Replicate implements BeamJobBuilder, Serializable {
     }
 
     @ElementListener
-    public void onElement(final JsonObject ignored) {
+    public void onElement(final JsonObject ignored, @Output final OutputEmitter<JsonObject> output,
+            @Output("second") final OutputEmitter<JsonObject> second) {
         // Dummy method to pass validate
         // no-op
     }
