@@ -11,7 +11,10 @@ import org.talend.sdk.component.api.component.Icon;
 import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.meta.Documentation;
+import org.talend.sdk.component.api.processor.ElementListener;
 import org.talend.sdk.component.api.processor.Processor;
+
+import javax.json.JsonObject;
 
 @Version
 @Icon(REPLICATE)
@@ -36,6 +39,12 @@ public class Replicate implements BeamJobBuilder, Serializable {
 
     public Replicate(@Option("configuration") final ReplicateConfiguration configuration) {
         this.configuration = configuration;
+    }
+
+    @ElementListener
+    public void onElement(final JsonObject ignored) {
+        // Dummy method to pass validate
+        // no-op
     }
 
     @Override
