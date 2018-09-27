@@ -1,14 +1,18 @@
 package org.talend.components.onedrive.sources.list;
 
 import org.talend.components.onedrive.helpers.ConfigurationHelper;
-import org.talend.components.onedrive.service.configuration.ConfigurationServiceList;
+import org.talend.components.onedrive.service.configuration.ConfigurationService;
 import org.talend.components.onedrive.service.graphclient.GraphClientService;
 import org.talend.components.onedrive.service.http.OneDriveAuthHttpClientService;
 import org.talend.components.onedrive.service.http.OneDriveHttpClientService;
 import org.talend.sdk.component.api.component.Icon;
 import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
-import org.talend.sdk.component.api.input.*;
+import org.talend.sdk.component.api.input.Assessor;
+import org.talend.sdk.component.api.input.Emitter;
+import org.talend.sdk.component.api.input.PartitionMapper;
+import org.talend.sdk.component.api.input.PartitionSize;
+import org.talend.sdk.component.api.input.Split;
 import org.talend.sdk.component.api.meta.Documentation;
 
 import javax.json.JsonReaderFactory;
@@ -35,14 +39,14 @@ public class OneDriveListMapper implements Serializable {
 
     public OneDriveListMapper(@Option("configuration") final OneDriveListConfiguration configuration,
             OneDriveAuthHttpClientService oneDriveAuthHttpClientService, OneDriveHttpClientService oneDriveHttpClientService,
-            ConfigurationServiceList configurationServiceList, JsonReaderFactory jsonReaderFactory,
+            ConfigurationService configurationService, JsonReaderFactory jsonReaderFactory,
             GraphClientService graphClientService) {
         this.configuration = configuration;
         this.oneDriveAuthHttpClientService = oneDriveAuthHttpClientService;
         this.oneDriveHttpClientService = oneDriveHttpClientService;
         this.jsonReaderFactory = jsonReaderFactory;
         this.graphClientService = graphClientService;
-        ConfigurationHelper.setupServicesList(configuration, configurationServiceList, oneDriveAuthHttpClientService);
+        ConfigurationHelper.setupServices(configuration, configurationService, oneDriveAuthHttpClientService);
     }
 
     @Assessor
