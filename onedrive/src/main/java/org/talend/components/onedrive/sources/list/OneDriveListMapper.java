@@ -1,7 +1,6 @@
 package org.talend.components.onedrive.sources.list;
 
 import org.talend.components.onedrive.helpers.ConfigurationHelper;
-import org.talend.components.onedrive.service.configuration.ConfigurationService;
 import org.talend.components.onedrive.service.graphclient.GraphClientService;
 import org.talend.components.onedrive.service.http.OneDriveAuthHttpClientService;
 import org.talend.components.onedrive.service.http.OneDriveHttpClientService;
@@ -29,7 +28,7 @@ public class OneDriveListMapper implements Serializable {
 
     private final OneDriveListConfiguration configuration;
 
-    private final OneDriveAuthHttpClientService oneDriveAuthHttpClientService;
+    // private final OneDriveAuthHttpClientService oneDriveAuthHttpClientService;
 
     private final OneDriveHttpClientService oneDriveHttpClientService;
 
@@ -39,14 +38,13 @@ public class OneDriveListMapper implements Serializable {
 
     public OneDriveListMapper(@Option("configuration") final OneDriveListConfiguration configuration,
             OneDriveAuthHttpClientService oneDriveAuthHttpClientService, OneDriveHttpClientService oneDriveHttpClientService,
-            ConfigurationService configurationService, JsonReaderFactory jsonReaderFactory,
-            GraphClientService graphClientService) {
+            JsonReaderFactory jsonReaderFactory, GraphClientService graphClientService) {
         this.configuration = configuration;
-        this.oneDriveAuthHttpClientService = oneDriveAuthHttpClientService;
+        // this.oneDriveAuthHttpClientService = oneDriveAuthHttpClientService;
         this.oneDriveHttpClientService = oneDriveHttpClientService;
         this.jsonReaderFactory = jsonReaderFactory;
         this.graphClientService = graphClientService;
-        ConfigurationHelper.setupServices(configuration, configurationService, oneDriveAuthHttpClientService);
+        ConfigurationHelper.setupServices(oneDriveAuthHttpClientService);
     }
 
     @Assessor
