@@ -14,7 +14,6 @@ import org.talend.sdk.component.api.input.PartitionSize;
 import org.talend.sdk.component.api.input.Split;
 import org.talend.sdk.component.api.meta.Documentation;
 
-import javax.json.JsonReaderFactory;
 import java.io.Serializable;
 import java.util.List;
 
@@ -28,21 +27,15 @@ public class OneDriveListMapper implements Serializable {
 
     private final OneDriveListConfiguration configuration;
 
-    // private final OneDriveAuthHttpClientService oneDriveAuthHttpClientService;
-
     private final OneDriveHttpClientService oneDriveHttpClientService;
-
-    private final JsonReaderFactory jsonReaderFactory;
 
     private final GraphClientService graphClientService;
 
     public OneDriveListMapper(@Option("configuration") final OneDriveListConfiguration configuration,
             OneDriveAuthHttpClientService oneDriveAuthHttpClientService, OneDriveHttpClientService oneDriveHttpClientService,
-            JsonReaderFactory jsonReaderFactory, GraphClientService graphClientService) {
+            GraphClientService graphClientService) {
         this.configuration = configuration;
-        // this.oneDriveAuthHttpClientService = oneDriveAuthHttpClientService;
         this.oneDriveHttpClientService = oneDriveHttpClientService;
-        this.jsonReaderFactory = jsonReaderFactory;
         this.graphClientService = graphClientService;
         ConfigurationHelper.setupServices(oneDriveAuthHttpClientService);
     }
@@ -59,6 +52,6 @@ public class OneDriveListMapper implements Serializable {
 
     @Emitter(name = "List")
     public OneDriveListSource createWorker() {
-        return new OneDriveListSource(configuration, oneDriveHttpClientService, jsonReaderFactory, graphClientService);
+        return new OneDriveListSource(configuration, oneDriveHttpClientService, graphClientService);
     }
 }
