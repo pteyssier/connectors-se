@@ -20,7 +20,7 @@ work_dir="$BASEDIR/target/docker_server"
 mkdir -p "$work_dir"
 cd "$work_dir"
     cp "$BASEDIR/src/main/docker/Dockerfile.server" Dockerfile
-    cp -r "$BASEDIR/target/docker-m2" m2
+    cp -r "$BASEDIR/target/docker-m2/" m2
     cp "$BASEDIR/target/connectors-se-docker-setup-shade.jar" setup.jar
     createComponentRegistry
 
@@ -38,8 +38,11 @@ cd "$work_dir"
     repoImageApp=$(extractApplicationName "$BASEDIR/src/main/docker/Dockerfile.repository")
     repoImage="$TALEND_REGISTRY/talend/$repoImageApp:$DOCKER_IMAGE_VERSION"
     echo "Copying repository from image $repoImage"
-    slurpImageFolder connector-se "$repoImage" /opt/talend/connectors-se ./connectors-se
+    slurpImageFolder connectors-se "$repoImage" /opt/talend/connectors-se ./connectors-se
 
     buildAndTag
     pushImage $LAST_IMAGE
+
+    echo "You can run 'docker run -e CONSOLE_LOG_LEVEL=INFO -p 8080:8080 talend/component-server-with-connectors-se:$DOCKER_IMAGE_VERSION'"
 cd -
+rm -Rf $work_dir
