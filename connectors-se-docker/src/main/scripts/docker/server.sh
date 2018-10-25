@@ -27,6 +27,7 @@ cd "$work_dir"
     serverImage="tacokit/component-server:$COMPONENT_SERVER_IMAGE_VERSION"
     echo "Copying server from image $serverImage"
     slurpImageFolder component-kit "$serverImage" /opt/talend/component-kit ./component-kit
+    slurpImageFolder sigar "$serverImage" /opt/talend/sigar ./sigar
     echo "" >> ./component-kit/bin/setenv.sh
     echo 'export MEECROWAVE_OPTS="$MEECROWAVE_OPTS -Dtalend.component.server.component.registry=/opt/talend/connectors-se/component-registry.properties"' >> ./component-kit/bin/setenv.sh
     echo 'export MEECROWAVE_OPTS="$MEECROWAVE_OPTS -Dtalend.component.server.maven.repository=/opt/talend/connectors-se"' >> ./component-kit/bin/setenv.sh
