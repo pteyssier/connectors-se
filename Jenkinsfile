@@ -41,7 +41,7 @@ spec:
   parameters {
     string(
       name: 'COMPONENT_SERVER_IMAGE_VERSION',
-      defaultValue: '1.1.2_20181108152043',
+      defaultValue: '1.1.2_20181108161652',
       description: 'The Component Server docker image tag')
   }
 
