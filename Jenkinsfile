@@ -109,8 +109,8 @@ spec:
       if (dockerImageVersion) {
         println "Launching Connectors EE build with SE docker image >${dockerImageVersion}<"
         build job: '/connectors-ee',
-              parameters: [ string(name: 'CONNECTORS_SE_IMAGE_VERSION', value: "${dockerImageVersion}") ]
-              wait: false, propagate: false,
+              parameters: [ string(name: 'CONNECTORS_SE_IMAGE_VERSION', value: "${dockerImageVersion}") ],
+              wait: false, propagate: false
       }
     }
     failure {
