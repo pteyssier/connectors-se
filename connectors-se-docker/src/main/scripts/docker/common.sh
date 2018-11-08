@@ -91,4 +91,7 @@ echo "-----------------------------------------------------"
 if [ ! -z "$DOCKER_SCRIPT_CONFIGURATION_DUMP" ]; then
     mkdir -p $(dirname "$DOCKER_SCRIPT_CONFIGURATION_DUMP")
     echo "dockerImageVersion=$DOCKER_IMAGE_VERSION" > "$DOCKER_SCRIPT_CONFIGURATION_DUMP"
+    echo "Created >$DOCKER_SCRIPT_CONFIGURATION_DUMP<"
+else
+    echo "DOCKER_SCRIPT_CONFIGURATION_DUMP not set"
 fi

@@ -35,8 +35,9 @@ spec:
   }
 
   environment {
-    MAVEN_OPTS = '-Dmaven.artifact.threads=128 -Dorg.slf4j.simpleLogger.showThreadName=true -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss'
-    TALEND_REGISTRY="registry.datapwn.com"
+    MAVEN_OPTS='-Dmaven.artifact.threads=128 -Dorg.slf4j.simpleLogger.showThreadName=true -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss'
+    TALEND_REGISTRY='registry.datapwn.com'
+    DOCKER_SCRIPT_CONFIGURATION_DUMP='target/docker-configuration.properties'
   }
 
   options {
@@ -69,8 +70,7 @@ spec:
             sh """
                  |chmod +x ./connectors-se-docker/src/main/scripts/docker/*.sh
                  |revision=`git rev-parse --abbrev-ref HEAD | tr / _`
-                 |DOCKER_SCRIPT_CONFIGURATION_DUMP=target/docker-configuration.properties \
-                 |  ./connectors-se-docker/src/main/scripts/docker/all.sh \$revision
+                 |./connectors-se-docker/src/main/scripts/docker/all.sh \$revision
                  |""".stripMargin()
 
             script {
