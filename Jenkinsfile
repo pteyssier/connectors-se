@@ -1,7 +1,6 @@
 def slackChannel = 'components-ci'
 def version = 'will be replaced'
 def image = 'will be replaced'
-def dockerImageVersion = ''
 
 pipeline {
   agent {
@@ -37,7 +36,13 @@ spec:
   environment {
     MAVEN_OPTS='-Dmaven.artifact.threads=128 -Dorg.slf4j.simpleLogger.showThreadName=true -Dorg.slf4j.simpleLogger.showDateTime=true -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss'
     TALEND_REGISTRY='registry.datapwn.com'
-    DOCKER_SCRIPT_CONFIGURATION_DUMP='target/docker-configuration.properties'
+  }
+
+  parameters {
+    string(
+      name: 'COMPONENT_SERVER_IMAGE_VERSION',
+      defaultValue: '1.1.2_20181108152043',
+      description: 'The Component Server docker image tag')
   }
 
   options {
@@ -72,13 +77,6 @@ spec:
                  |revision=`git rev-parse --abbrev-ref HEAD | tr / _`
                  |./connectors-se-docker/src/main/scripts/docker/all.sh \$revision
                  |""".stripMargin()
-
-            script {
-              // since the previous script can output a lot of data we want to see on jenkins
-              // then we read its output from a file
-              def dockerConfiguration = readProperties file: 'target/docker-configuration.properties'
-              dockerImageVersion = dockerConfiguration.dockerImageVersion
-            }
           }
         }
       }
@@ -106,10 +104,10 @@ spec:
     success {
       slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
       script {
-        if (dockerImageVersion) {
-          println "Launching Connectors EE build with SE docker image >${dockerImageVersion}<"
+        if (env.COMPONENT_SERVER_IMAGE_VERSION) {
+          println "Launching Connectors EE build with component server docker image >${env.COMPONENT_SERVER_IMAGE_VERSION}<"
           build job: '/connectors-ee/master',
-                parameters: [ string(name: 'CONNECTORS_SE_IMAGE_VERSION', value: "${dockerImageVersion}") ],
+                parameters: [ string(name: 'COMPONENT_SERVER_IMAGE_VERSION', value: "${env.COMPONENT_SERVER_IMAGE_VERSION}") ],
                 wait: false, propagate: false
           }
       }

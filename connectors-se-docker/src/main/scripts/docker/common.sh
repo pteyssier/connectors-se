@@ -16,7 +16,10 @@
 #  limitations under the License.
 #
 
-export COMPONENT_SERVER_IMAGE_VERSION=1.1.2_20181108152043
+if [ -z $COMPONENT_SERVER_IMAGE_VERSION ]; then
+  read -p "Enter COMPONENT_SERVER_IMAGE_VERSION (ex: 1.1.2_20181108152043): " COMPONENT_SERVER_IMAGE_VERSION
+fi
+export COMPONENT_SERVER_IMAGE_VERSION
 
 export BASEDIR=$(cd "$(dirname "$0")" ; pwd -P)/../../../..
 export CONNECTOR_VERSION=$(grep "<version>" "$BASEDIR/pom.xml" | head -n 1 | sed "s/.*>\\(.*\\)<.*/\\1/")
@@ -87,11 +90,3 @@ echo " - TALEND_REGISTRY=$TALEND_REGISTRY"
 echo " - DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION"
 echo ""
 echo "-----------------------------------------------------"
-
-if [ ! -z "$DOCKER_SCRIPT_CONFIGURATION_DUMP" ]; then
-    mkdir -p $(dirname "$DOCKER_SCRIPT_CONFIGURATION_DUMP")
-    echo "dockerImageVersion=$DOCKER_IMAGE_VERSION" > "$DOCKER_SCRIPT_CONFIGURATION_DUMP"
-    echo "Created >$DOCKER_SCRIPT_CONFIGURATION_DUMP<"
-else
-    echo "DOCKER_SCRIPT_CONFIGURATION_DUMP not set"
-fi
