@@ -87,3 +87,8 @@ echo " - TALEND_REGISTRY=$TALEND_REGISTRY"
 echo " - DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION"
 echo ""
 echo "-----------------------------------------------------"
+
+if [ ! -z "$DOCKER_SCRIPT_CONFIGURATION_DUMP" ]; then
+    mkdir -p $(dirname "$DOCKER_SCRIPT_CONFIGURATION_DUMP")
+    echo "dockerImageVersion=$DOCKER_IMAGE_VERSION" > "$DOCKER_SCRIPT_CONFIGURATION_DUMP"
+fi

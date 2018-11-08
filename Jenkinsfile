@@ -1,6 +1,7 @@
 def slackChannel = 'components'
 def version = 'will be replaced'
 def image = 'will be replaced'
+def dockerImageVersion = ''
 
 pipeline {
   agent {
@@ -12,7 +13,7 @@ kind: Pod
 spec:
   containers:
     - name: maven
-      image: jenkinsxio/builder-maven:0.0.319
+      image: jenkinsxio/builder-maven:0.1.60
       command:
       - cat
       tty: true
@@ -65,7 +66,16 @@ spec:
               passwordVariable: 'DOCKER_PASSWORD',
               usernameVariable: 'DOCKER_LOGIN')
           ]) {
-            sh "chmod +x ./connectors-se-docker/src/main/scripts/docker/*.sh && ./connectors-se-docker/src/main/scripts/docker/all.sh `git rev-parse --abbrev-ref HEAD | tr / _`"
+            sh """
+                 |chmod +x ./connectors-se-docker/src/main/scripts/docker/*.sh
+                 |revision=`git rev-parse --abbrev-ref HEAD | tr / _`
+                 |DOCKER_SCRIPT_CONFIGURATION_DUMP=target/docker-configuration.properties \
+                 |  ./connectors-se-docker/src/main/scripts/docker/all.sh $revision
+                 |""".stripMargin()
+            // since the previous script can output a lot of data we want to see on jenkins
+            // then we read its output from a file
+            def dockerConfiguration = readProperties file: 'target/docker-configuration.properties'
+            dockerImageVersion = dockerConfiguration.dockerImageVersion
           }
         }
       }
@@ -92,6 +102,13 @@ spec:
     }
     success {
       slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
+
+      if (dockerImageVersion) {
+        println "Launching Connectors EE build with SE docker image >${dockerImageVersion}<"
+        build job: '/connectors-ee',
+              parameters: [ string(name: 'CONNECTORS_SE_IMAGE_VERSION', value: "${dockerImageVersion}") ]
+              wait: false, propagate: false,
+      }
     }
     failure {
       slackSend (color: '#FF0000', message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
