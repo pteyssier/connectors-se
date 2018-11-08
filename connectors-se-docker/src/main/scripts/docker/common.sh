@@ -59,7 +59,7 @@ function pushImage() {
         echo "$DOCKER_PASSWORD" | docker login "$TALEND_REGISTRY" -u "$DOCKER_LOGIN" --password-stdin
         set -x
         for i in {1..5}; do
-            docker push "$TALEND_REGISTRY/$1" && break || sleep 15
+            docker push "$TALEND_REGISTRY/$1" && break || sleep 5
         done
     else
         echo "No DOCKER_LOGIN set so skipping push of >$1<"
