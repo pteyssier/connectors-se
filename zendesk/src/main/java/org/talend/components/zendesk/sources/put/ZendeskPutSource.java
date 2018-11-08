@@ -1,6 +1,8 @@
 package org.talend.components.zendesk.sources.put;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.util.StdDateFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.talend.components.zendesk.helpers.CommonHelper;
 import org.talend.components.zendesk.helpers.ConfigurationHelper;
@@ -59,11 +61,11 @@ public class ZendeskPutSource implements Serializable {
             switch (configuration.getDataSet().getSelectionType()) {
             case REQUESTS:
                 Request item = getData(record, Request.class);
-                newRecord = zendeskHttpClientService.putRequests(configuration.getDataSet().getDataStore(), item);
+                newRecord = zendeskHttpClientService.putRequest(configuration.getDataSet().getDataStore(), item);
                 break;
             case TICKETS:
                 Ticket ticket = getData(record, Ticket.class);
-                newRecord = zendeskHttpClientService.putRequests(configuration.getDataSet().getDataStore(), ticket);
+                newRecord = zendeskHttpClientService.putTicket(configuration.getDataSet().getDataStore(), ticket);
                 break;
             default:
                 throw new UnsupportedOperationException();
@@ -83,7 +85,11 @@ public class ZendeskPutSource implements Serializable {
     }
 
     private <T> T getData(JsonObject record, final Class<T> clazz) throws IOException {
-        return new ObjectMapper().readerFor(clazz).readValue(record.toString());
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.setDateFormat(StdDateFormat.getDateTimeInstance());
+
+        return objectMapper.readerFor(clazz).readValue(record.toString());
     }
 
 }

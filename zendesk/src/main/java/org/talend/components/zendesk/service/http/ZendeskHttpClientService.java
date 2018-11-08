@@ -42,7 +42,7 @@ public class ZendeskHttpClientService {
         return new InputIterator(data.iterator(), jsonReaderFactory);
     }
 
-    public JsonObject putRequests(ZendeskDataStore dataStore, Request request) {
+    public JsonObject putRequest(ZendeskDataStore dataStore, Request request) {
         log.debug("put requests");
         Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore).getZendeskServiceClient();
         Request newItem = zendeskServiceClient.createRequest(request);
@@ -61,5 +61,12 @@ public class ZendeskHttpClientService {
         Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore).getZendeskServiceClient();
         Iterable<Ticket> data = zendeskServiceClient.getTickets();
         return new InputIterator(data.iterator(), jsonReaderFactory);
+    }
+
+    public JsonObject putTicket(ZendeskDataStore dataStore, Ticket ticket) {
+        log.debug("put tickets");
+        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore).getZendeskServiceClient();
+        Ticket newItem = zendeskServiceClient.createTicket(ticket);
+        return StringHelper.objectToJson(newItem, jsonReaderFactory);
     }
 }
