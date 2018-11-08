@@ -105,12 +105,13 @@ spec:
     }
     success {
       slackSend (color: '#00FF00', message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})", channel: "${slackChannel}")
-
-      if (dockerImageVersion) {
-        println "Launching Connectors EE build with SE docker image >${dockerImageVersion}<"
-        build job: '/connectors-ee',
-              parameters: [ string(name: 'CONNECTORS_SE_IMAGE_VERSION', value: "${dockerImageVersion}") ],
-              wait: false, propagate: false
+      script {
+        if (dockerImageVersion) {
+          println "Launching Connectors EE build with SE docker image >${dockerImageVersion}<"
+          build job: '/connectors-ee',
+                parameters: [ string(name: 'CONNECTORS_SE_IMAGE_VERSION', value: "${dockerImageVersion}") ],
+                wait: false, propagate: false
+          }
       }
     }
     failure {
