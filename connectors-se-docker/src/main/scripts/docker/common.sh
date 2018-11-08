@@ -88,5 +88,6 @@ function createComponentRegistry() {
 echo "Environment:"
 echo " - TALEND_REGISTRY=$TALEND_REGISTRY"
 echo " - DOCKER_IMAGE_VERSION=$DOCKER_IMAGE_VERSION"
+echo " - COMPONENT_SERVER_IMAGE_VERSION=$COMPONENT_SERVER_IMAGE_VERSION"
 echo ""
 echo "-----------------------------------------------------"
