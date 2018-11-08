@@ -1,4 +1,4 @@
-def slackChannel = 'components'
+def slackChannel = 'components-ci'
 def version = 'will be replaced'
 def image = 'will be replaced'
 def dockerImageVersion = ''
