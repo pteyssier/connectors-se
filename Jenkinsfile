@@ -72,10 +72,13 @@ spec:
                  |DOCKER_SCRIPT_CONFIGURATION_DUMP=target/docker-configuration.properties \
                  |  ./connectors-se-docker/src/main/scripts/docker/all.sh $revision
                  |""".stripMargin()
-            // since the previous script can output a lot of data we want to see on jenkins
-            // then we read its output from a file
-            def dockerConfiguration = readProperties file: 'target/docker-configuration.properties'
-            dockerImageVersion = dockerConfiguration.dockerImageVersion
+
+            script {
+              // since the previous script can output a lot of data we want to see on jenkins
+              // then we read its output from a file
+              def dockerConfiguration = readProperties file: 'target/docker-configuration.properties'
+              dockerImageVersion = dockerConfiguration.dockerImageVersion
+            }
           }
         }
       }
