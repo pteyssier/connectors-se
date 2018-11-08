@@ -70,7 +70,7 @@ spec:
                  |chmod +x ./connectors-se-docker/src/main/scripts/docker/*.sh
                  |revision=`git rev-parse --abbrev-ref HEAD | tr / _`
                  |DOCKER_SCRIPT_CONFIGURATION_DUMP=target/docker-configuration.properties \
-                 |  ./connectors-se-docker/src/main/scripts/docker/all.sh $revision
+                 |  ./connectors-se-docker/src/main/scripts/docker/all.sh \$revision
                  |""".stripMargin()
 
             script {
