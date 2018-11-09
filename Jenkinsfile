@@ -88,6 +88,20 @@ spec:
         }
       }
     }
+    stage('Nexus Deployment') {
+      when {
+        allOf {
+          expression {
+            'master' == env.BRANCH_NAME
+          }
+        }
+      }
+      steps {
+        container('maven') {
+          sh 'mvn -s .jenkins/settings.xml clean deploy -T1C -DskipTests'
+        }
+      }
+    }
   }
   post {
     always {
