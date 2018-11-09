@@ -28,15 +28,12 @@ public class ZendeskGetMapper implements Serializable {
 
     private final ZendeskHttpClientService zendeskHttpClientService;
 
-    private final ZendeskAuthHttpClientService zendeskAuthHttpClientService;
-
     public ZendeskGetMapper(@Option("configuration") final ZendeskGetConfiguration configuration,
             final ZendeskHttpClientService zendeskHttpClientService,
             final ZendeskAuthHttpClientService zendeskAuthHttpClientService) {
         this.configuration = configuration;
         this.zendeskHttpClientService = zendeskHttpClientService;
-        this.zendeskAuthHttpClientService = zendeskAuthHttpClientService;
-        ConfigurationHelper.setupServices(zendeskAuthHttpClientService);
+        ConfigurationHelper.setupServices();
     }
 
     @Assessor
@@ -51,6 +48,6 @@ public class ZendeskGetMapper implements Serializable {
 
     @Emitter(name = "Input")
     public ZendeskGetSource createWorker() {
-        return new ZendeskGetSource(configuration, zendeskHttpClientService, zendeskAuthHttpClientService);
+        return new ZendeskGetSource(configuration, zendeskHttpClientService);
     }
 }

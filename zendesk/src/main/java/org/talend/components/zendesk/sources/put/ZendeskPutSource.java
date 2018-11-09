@@ -1,14 +1,11 @@
 package org.talend.components.zendesk.sources.put;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
 import lombok.extern.slf4j.Slf4j;
 import org.talend.components.zendesk.helpers.CommonHelper;
 import org.talend.components.zendesk.helpers.ConfigurationHelper;
+import org.talend.components.zendesk.helpers.JsonHelper;
 import org.talend.components.zendesk.service.http.ZendeskAuthHttpClientService;
 import org.talend.components.zendesk.service.http.ZendeskHttpClientService;
-import org.talend.components.zendesk.service.zendeskclient.ZendeskClientService;
 import org.talend.components.zendesk.sources.Reject;
 import org.talend.sdk.component.api.component.Icon;
 import org.talend.sdk.component.api.component.Version;
@@ -37,15 +34,12 @@ public class ZendeskPutSource implements Serializable {
 
     private ZendeskHttpClientService zendeskHttpClientService;
 
-    private ZendeskClientService zendeskClientService;
-
     public ZendeskPutSource(@Option("configuration") final ZendeskPutConfiguration configuration,
             final ZendeskHttpClientService zendeskHttpClientService,
-            final ZendeskAuthHttpClientService zendeskAuthHttpClientService, ZendeskClientService zendeskClientService) {
+            final ZendeskAuthHttpClientService zendeskAuthHttpClientService) {
         this.configuration = configuration;
         this.zendeskHttpClientService = zendeskHttpClientService;
-        this.zendeskClientService = zendeskClientService;
-        ConfigurationHelper.setupServices(zendeskAuthHttpClientService);
+        ConfigurationHelper.setupServices();
     }
 
     @ElementListener
@@ -60,11 +54,11 @@ public class ZendeskPutSource implements Serializable {
             JsonObject newRecord;
             switch (configuration.getDataSet().getSelectionType()) {
             case REQUESTS:
-                Request item = getData(record, Request.class);
+                Request item = JsonHelper.jsonObjectToObjectInstance(record, Request.class);
                 newRecord = zendeskHttpClientService.putRequest(configuration.getDataSet().getDataStore(), item);
                 break;
             case TICKETS:
-                Ticket ticket = getData(record, Ticket.class);
+                Ticket ticket = JsonHelper.jsonObjectToObjectInstance(record, Ticket.class);
                 newRecord = zendeskHttpClientService.putTicket(configuration.getDataSet().getDataStore(), ticket);
                 break;
             default:
@@ -74,22 +68,6 @@ public class ZendeskPutSource implements Serializable {
         } catch (Exception e) {
             CommonHelper.processException(e, record, reject);
         }
-    }
-
-    private Class getDataClass() {
-        switch (configuration.getDataSet().getSelectionType()) {
-        case TICKETS:
-            return Ticket.class;
-        }
-        throw new UnsupportedOperationException("Unknown selection type");
-    }
-
-    private <T> T getData(JsonObject record, final Class<T> clazz) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-        objectMapper.setDateFormat(StdDateFormat.getDateTimeInstance());
-
-        return objectMapper.readerFor(clazz).readValue(record.toString());
     }
 
 }

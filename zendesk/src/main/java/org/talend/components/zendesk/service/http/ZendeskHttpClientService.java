@@ -2,9 +2,10 @@ package org.talend.components.zendesk.service.http;
 
 import lombok.extern.slf4j.Slf4j;
 import org.talend.components.zendesk.common.ZendeskDataStore;
-import org.talend.components.zendesk.helpers.StringHelper;
+import org.talend.components.zendesk.helpers.JsonHelper;
 import org.talend.components.zendesk.service.zendeskclient.ZendeskClientService;
 import org.talend.components.zendesk.sources.get.InputIterator;
+import org.talend.components.zendesk.sources.get.ZendeskGetConfiguration;
 import org.talend.sdk.component.api.service.Service;
 import org.zendesk.client.v2.Zendesk;
 import org.zendesk.client.v2.model.Request;
@@ -46,7 +47,7 @@ public class ZendeskHttpClientService {
         log.debug("put requests");
         Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore).getZendeskServiceClient();
         Request newItem = zendeskServiceClient.createRequest(request);
-        return StringHelper.objectToJson(newItem, jsonReaderFactory);
+        return JsonHelper.objectToJsonObject(newItem, jsonReaderFactory);
     }
 
     public InputIterator getCCRequests(ZendeskDataStore dataStore) {
@@ -56,17 +57,24 @@ public class ZendeskHttpClientService {
         return new InputIterator(data.iterator(), jsonReaderFactory);
     }
 
-    public InputIterator getTickets(ZendeskDataStore dataStore) {
+    public InputIterator getTickets(ZendeskGetConfiguration configuration) {
         log.debug("get tickets");
-        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore).getZendeskServiceClient();
-        Iterable<Ticket> data = zendeskServiceClient.getTickets();
+        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(configuration.getDataSet().getDataStore())
+                .getZendeskServiceClient();
+        // Iterable<Ticket> data = zendeskServiceClient.getTickets();
+        Iterable<Ticket> data = zendeskServiceClient.getSearchResults(Ticket.class, configuration.getQueryString());
         return new InputIterator(data.iterator(), jsonReaderFactory);
     }
 
     public JsonObject putTicket(ZendeskDataStore dataStore, Ticket ticket) {
         log.debug("put tickets");
         Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore).getZendeskServiceClient();
-        Ticket newItem = zendeskServiceClient.createTicket(ticket);
-        return StringHelper.objectToJson(newItem, jsonReaderFactory);
+        Ticket newItem;
+        if (ticket.getId() == null) {
+            newItem = zendeskServiceClient.createTicket(ticket);
+        } else {
+            newItem = zendeskServiceClient.updateTicket(ticket);
+        }
+        return JsonHelper.objectToJsonObject(newItem, jsonReaderFactory);
     }
 }

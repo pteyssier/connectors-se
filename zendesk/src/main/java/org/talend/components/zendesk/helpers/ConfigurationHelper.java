@@ -2,7 +2,6 @@ package org.talend.components.zendesk.helpers;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.talend.components.zendesk.service.http.ZendeskAuthHttpClientService;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ConfigurationHelper {
@@ -18,7 +17,7 @@ public class ConfigurationHelper {
 
     public static final String DISCOVER_SCHEMA_LIST_ID = "DiscoverSchemaList";
 
-    public static void setupServices(ZendeskAuthHttpClientService zendeskAuthHttpClientService) {
+    public static void setupServices() {
     }
 
 }

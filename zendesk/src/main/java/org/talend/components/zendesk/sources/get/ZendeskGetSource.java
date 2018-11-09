@@ -1,7 +1,6 @@
 package org.talend.components.zendesk.sources.get;
 
 import lombok.extern.slf4j.Slf4j;
-import org.talend.components.zendesk.service.http.ZendeskAuthHttpClientService;
 import org.talend.components.zendesk.service.http.ZendeskHttpClientService;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.input.Producer;
@@ -22,8 +21,7 @@ public class ZendeskGetSource implements Serializable {
     private InputIterator itemIterator;
 
     public ZendeskGetSource(@Option("configuration") final ZendeskGetConfiguration configuration,
-            final ZendeskHttpClientService zendeskHttpClientService,
-            final ZendeskAuthHttpClientService zendeskAuthHttpClientService) {
+            final ZendeskHttpClientService zendeskHttpClientService) {
         this.configuration = configuration;
         this.zendeskHttpClientService = zendeskHttpClientService;
     }
@@ -34,11 +32,8 @@ public class ZendeskGetSource implements Serializable {
         case REQUESTS:
             itemIterator = zendeskHttpClientService.getRequests(configuration.getDataSet().getDataStore());
             break;
-        // case REQUESTS_CC:
-        // itemIterator = zendeskHttpClientService.getCCRequests(configuration.getDataStore());
-        // break;
         case TICKETS:
-            itemIterator = zendeskHttpClientService.getTickets(configuration.getDataSet().getDataStore());
+            itemIterator = zendeskHttpClientService.getTickets(configuration);
             break;
         }
     }

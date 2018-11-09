@@ -2,7 +2,7 @@ package org.talend.components.zendesk.sources.get;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.talend.components.zendesk.helpers.StringHelper;
+import org.talend.components.zendesk.helpers.JsonHelper;
 
 import javax.json.JsonObject;
 import javax.json.JsonReaderFactory;
@@ -29,6 +29,6 @@ public class InputIterator implements Iterator<JsonObject> {
             return null;
         }
         Object obj = dataListIterator.next();
-        return StringHelper.objectToJson(obj, jsonReaderFactory);
+        return JsonHelper.objectToJsonObject(obj, jsonReaderFactory);
     }
 }
