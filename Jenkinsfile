@@ -13,7 +13,7 @@ def createContainer(name) {
       volumeMounts:
       - name: docker
         mountPath: /var/run/docker.sock
-      - name: ${name}
+      - name: m2${name}
         mountPath: /root/.m2/repository"""
 }
 
