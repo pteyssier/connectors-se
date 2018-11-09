@@ -16,18 +16,6 @@ def createContainer(name) {
       - name: ${name}
         mountPath: /root/.m2/repository"""
 }
-def createVolume(name) {
-    """- name: ${name}
-      image: jenkinsxio/builder-maven:0.1.60
-      command:
-      - cat
-      tty: true
-      volumeMounts:
-      - name: docker
-        mountPath: /var/run/docker.sock
-      - name: m2${name}
-        mountPath: /root/.m2/repository"""
-}
 
 pipeline {
   agent {
