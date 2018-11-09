@@ -131,7 +131,7 @@ spec:
                   usernameVariable: 'NEXUS_USER',
                   passwordVariable: 'NEXUS_PASSWORD')
               ]) {
-                sh "mvn -s .jenkins/settings.xml clean deploy -T8 -DskipTests -DaltDeploymentRepository=talend.snapshots::default::${deploymentRepository}"
+                sh "mvn -s .jenkins/settings.xml clean deploy -e -DskipTests -DaltDeploymentRepository=talend.snapshots::default::${deploymentRepository}"
               }
             }
           }
