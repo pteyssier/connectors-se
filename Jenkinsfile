@@ -90,11 +90,7 @@ spec:
     }
     stage('Nexus Deployment') {
       when {
-        allOf {
-          expression {
-            'master' == env.BRANCH_NAME
-          }
-        }
+        expression { env.BRANCH_NAME == 'master' }
       }
       steps {
         container('maven') {
