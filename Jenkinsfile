@@ -2,7 +2,8 @@ def slackChannel = 'components-ci'
 def version = 'will be replaced'
 def image = 'will be replaced'
 
-def deploymentRepository = "https://artifacts-zl.talend.com/nexus/content/repositories/snapshots/tdi/${env.BRANCH_NAME}"
+def deploymentSuffix = env.BRANCH_NAME == "master" ? "" : ("tdi/${env.BRANCH_NAME}")
+def deploymentRepository = "https://artifacts-zl.talend.com/nexus/content/repositories/snapshots/${deploymentSuffix}"
 
 def createContainer(name) {
     """- name: ${name}
