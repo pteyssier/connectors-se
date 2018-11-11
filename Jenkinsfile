@@ -110,7 +110,7 @@ spec:
         stage('Site') {
           steps {
             container('main') {
-              sh 'mvn clean site:site site:stage -T1C -Dmaven.test.failure.ignore=true'
+              sh 'mvn clean site site:stage -T1C -Dmaven.test.failure.ignore=true'
             }
           }
           post {
