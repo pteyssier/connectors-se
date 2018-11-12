@@ -62,10 +62,10 @@ spec:
         stage('Run maven') {
             steps {
                 container('main') {
-                    sh 'mvn clean install -T1C -Pdocker -U'
-                    // prepare for next concurrent steps
-                    sh 'mvn clean && git reset --hard'
+                    // for next concurrent builds
                     sh 'for i in ci_docker ci_nexus ci_site; do rm -Rf $i; rsync -av . $i; done'
+                    // real task
+                    sh 'mvn clean install -T1C -Pdocker'
                 }
             }
             post {
