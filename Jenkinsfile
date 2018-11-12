@@ -98,7 +98,7 @@ spec:
                   passwordVariable: 'DOCKER_PASSWORD',
                   usernameVariable: 'DOCKER_LOGIN')
               ]) {
-                sh 'mvn clean install -T1C -Pdocker -DskipTests'
+                sh 'mvn clean install -Pdocker -DskipTests'
                 sh """
                      |chmod +x ./connectors-se-docker/src/main/scripts/docker/*.sh
                      |revision=`git rev-parse --abbrev-ref HEAD | tr / _`
