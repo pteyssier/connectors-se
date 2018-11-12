@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.asynchttpclient.ListenableFuture;
 import org.talend.components.zendesk.common.ZendeskDataStore;
 import org.talend.components.zendesk.helpers.JsonHelper;
-import org.talend.components.zendesk.helpers.StringHelper;
 import org.talend.components.zendesk.service.zendeskclient.ZendeskClientService;
 import org.talend.components.zendesk.sources.Reject;
 import org.talend.components.zendesk.sources.get.InputIterator;
@@ -20,8 +19,6 @@ import org.zendesk.client.v2.model.User;
 
 import javax.json.JsonObject;
 import javax.json.JsonReaderFactory;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -71,12 +68,12 @@ public class ZendeskHttpClientService {
             data = zendeskServiceClient.getTickets();
         } else {
             // the result is available on Zendesk server after indexing
-            try {
-                data = zendeskServiceClient.getSearchResults(Ticket.class,
-                        URLEncoder.encode(configuration.getQueryString(), StringHelper.STRING_CHARSET));
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
+            // try {
+            data = zendeskServiceClient.getSearchResults(Ticket.class, configuration.getQueryString());
+            // URLEncoder.encode(configuration.getQueryString(), StringHelper.STRING_CHARSET));
+            // } catch (UnsupportedEncodingException e) {
+            // throw new RuntimeException(e);
+            // }
         }
         return new InputIterator(data.iterator(), jsonReaderFactory);
     }
