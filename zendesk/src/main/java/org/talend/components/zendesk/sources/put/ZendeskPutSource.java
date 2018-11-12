@@ -7,10 +7,13 @@ import org.talend.components.zendesk.helpers.JsonHelper;
 import org.talend.components.zendesk.service.http.ZendeskAuthHttpClientService;
 import org.talend.components.zendesk.service.http.ZendeskHttpClientService;
 import org.talend.components.zendesk.sources.Reject;
+import org.talend.components.zendesk.sources.get.SelectionType;
 import org.talend.sdk.component.api.component.Icon;
 import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.meta.Documentation;
+import org.talend.sdk.component.api.processor.AfterGroup;
+import org.talend.sdk.component.api.processor.BeforeGroup;
 import org.talend.sdk.component.api.processor.ElementListener;
 import org.talend.sdk.component.api.processor.Input;
 import org.talend.sdk.component.api.processor.Output;
@@ -22,6 +25,9 @@ import org.zendesk.client.v2.model.Ticket;
 import javax.json.JsonObject;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Version(1)
@@ -34,6 +40,8 @@ public class ZendeskPutSource implements Serializable {
 
     private ZendeskHttpClientService zendeskHttpClientService;
 
+    private List<JsonObject> batchData = new ArrayList<>();
+
     public ZendeskPutSource(@Option("configuration") final ZendeskPutConfiguration configuration,
             final ZendeskHttpClientService zendeskHttpClientService,
             final ZendeskAuthHttpClientService zendeskAuthHttpClientService) {
@@ -42,10 +50,20 @@ public class ZendeskPutSource implements Serializable {
         ConfigurationHelper.setupServices();
     }
 
+    @BeforeGroup
+    public void beforeGroup() {
+
+    }
+
     @ElementListener
     public void onNext(@Input final JsonObject record, final @Output OutputEmitter<JsonObject> success,
             final @Output("reject") OutputEmitter<Reject> reject) throws IOException {
-        processOutputElement(record, success, reject);
+        boolean useBatch = configuration.isUseBatch();
+        if (useBatch && configuration.getDataSet().getSelectionType() == SelectionType.TICKETS) {
+            batchData.add(record);
+        } else {
+            processOutputElement(record, success, reject);
+        }
     }
 
     private void processOutputElement(final JsonObject record, OutputEmitter<JsonObject> success, OutputEmitter<Reject> reject) {
@@ -64,10 +82,32 @@ public class ZendeskPutSource implements Serializable {
             default:
                 throw new UnsupportedOperationException();
             }
+            checkNullResult(newRecord);
             success.emit(newRecord);
         } catch (Exception e) {
             CommonHelper.processException(e, record, reject);
         }
     }
 
+    private void checkNullResult(JsonObject newRecord) {
+        if (newRecord == null) {
+            throw new RuntimeException("Object processing error.");
+        }
+    }
+
+    @AfterGroup
+    public void afterGroup(final @Output OutputEmitter<JsonObject> success,
+            final @Output("reject") OutputEmitter<Reject> reject) {
+        if (!batchData.isEmpty()) {
+            switch (configuration.getDataSet().getSelectionType()) {
+            case TICKETS:
+                zendeskHttpClientService.putTickets(configuration.getDataSet().getDataStore(),
+                        batchData.stream().map(jsonObject -> JsonHelper.jsonObjectToObjectInstance(jsonObject, Ticket.class))
+                                .collect(Collectors.toList()),
+                        success, reject);
+                break;
+            }
+        }
+        batchData.clear();
+    }
 }

@@ -24,8 +24,12 @@ public class JsonHelper {
         objectMapper.setDateFormat(StdDateFormat.getDateTimeInstance());
     }
 
-    public static <T> T jsonObjectToObjectInstance(JsonObject record, final Class<T> clazz) throws IOException {
-        return objectMapper.readerFor(clazz).readValue(record.toString());
+    public static <T> T jsonObjectToObjectInstance(JsonObject record, final Class<T> clazz) {
+        try {
+            return objectMapper.readerFor(clazz).readValue(record.toString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static JsonObject objectToJsonObject(Object obj, JsonReaderFactory jsonReaderFactory) {

@@ -33,4 +33,8 @@ public class ZendeskGetConfiguration implements Serializable {
     @Documentation("Query string. See Zendesk API documentation. Example: 'status:open created>2012-07-17'")
     private String queryString;
 
+    public boolean isQueryStringEmpty() {
+        return queryString == null || queryString.isEmpty();
+    }
+
 }
