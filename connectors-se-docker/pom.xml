@@ -98,6 +98,10 @@
     </dependency>
   </dependencies>
 
+  <properties>
+    <talend.icon-report.skip>false</talend.icon-report.skip>
+  </properties>
+
   <build>
     <plugins>
       <!-- the component repo with its registry -->

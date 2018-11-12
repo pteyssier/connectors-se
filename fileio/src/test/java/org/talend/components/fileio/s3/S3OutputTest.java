@@ -27,7 +27,7 @@ class S3OutputTest {
     @Injected
     private ComponentsHandler handler;
 
-    //    @Service
+    // @Service
     // private S3ConfigurationService configurationService;
 
     @Test
