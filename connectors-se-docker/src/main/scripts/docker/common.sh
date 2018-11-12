@@ -54,6 +54,17 @@ function buildAndTag() {
         . && \
     docker tag "$image" "$TALEND_REGISTRY/$image" || exit 1
     export LAST_IMAGE="$image"
+
+    if [ -n "$DOCKER_HTML" ]; then
+        echo >> "$DOCKER_HTML" << EOF
+  <tr>
+    <td>$TALEND_REGISTRY</td>
+    <td>$imageName</td>
+    <td>$DOCKER_IMAGE_VERSION</td>
+    <td>$image</td>
+  </tr>
+EOF
+    fi
 }
 
 function pushImage() {

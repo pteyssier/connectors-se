@@ -99,6 +99,14 @@ spec:
                             }
                         }
                     }
+                    post {
+                        always {
+                            publishHTML(target: [
+                                    allowMissing: true, alwaysLinkToLastBuild: false, keepAll: true,
+                                    reportDir   : 'target', reportFiles: 'docker.html', reportName: "Docker Images"
+                            ])
+                        }
+                    }
                 }
                 stage('Site') {
                     steps {

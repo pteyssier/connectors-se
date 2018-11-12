@@ -16,6 +16,43 @@
 #  limitations under the License.
 #
 
+
 . "$(dirname $0)/common.sh" $1
+export DOCKER_HTML="$BASEDIR/target/docker.html"
+
+mkdir -p target
+echo > "$DOCKER_HTML" << EOF
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+</style>
+</head>
+<body>
+
+<h2>Docker Images</h2>
+
+<table>
+  <tr>
+    <th>Repository</th>
+    <th>Image</th>
+    <th>Version</th>
+    <th>Tag</th>
+  </tr>
+EOF
+
+
 . "$(dirname $0)/repository.sh"
 . "$(dirname $0)/server.sh"
+
+echo >> "$DOCKER_HTML" << EOF
+</table>
+
+</body>
+</html>
+EOF
+
