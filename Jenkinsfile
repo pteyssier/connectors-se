@@ -91,7 +91,7 @@ spec:
                             ]) {
                                 sh """
                      |cd ci_docker
-                     |mvn clean install -Pdocker -DskipTests -U
+                     |mvn clean install -Pdocker -DskipTests
                      |chmod +x ./connectors-se-docker/src/main/scripts/docker/*.sh
                      |revision=`git rev-parse --abbrev-ref HEAD | tr / _`
                      |./connectors-se-docker/src/main/scripts/docker/all.sh \$revision
@@ -132,7 +132,7 @@ spec:
                                             usernameVariable: 'NEXUS_USER',
                                             passwordVariable: 'NEXUS_PASSWORD')
                             ]) {
-                                sh "cd ci_nexus && mvn -s .jenkins/settings.xml clean deploy  -U -e -DskipTests -DaltDeploymentRepository=talend.snapshots::default::${deploymentRepository}"
+                                sh "cd ci_nexus && mvn -s .jenkins/settings.xml clean deploy -e -DskipTests -DaltDeploymentRepository=talend.snapshots::default::${deploymentRepository}"
                             }
                         }
                     }
