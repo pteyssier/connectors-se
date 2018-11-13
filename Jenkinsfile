@@ -103,7 +103,7 @@ spec:
                         always {
                             publishHTML(target: [
                                     allowMissing: true, alwaysLinkToLastBuild: false, keepAll: true,
-                                    reportDir   : 'connectors-se-docker/target', reportFiles: 'docker.html', reportName: "Docker Images"
+                                    reportDir   : 'ci_docker/connectors-se-docker/target', reportFiles: 'docker.html', reportName: "Docker Images"
                             ])
                         }
                     }
@@ -118,7 +118,7 @@ spec:
                         always {
                             publishHTML(target: [
                                     allowMissing: true, alwaysLinkToLastBuild: false, keepAll: true,
-                                    reportDir   : 'target/staging', reportFiles: 'index.html', reportName: "Maven Site"
+                                    reportDir   : 'ci_site/target/staging', reportFiles: 'index.html', reportName: "Maven Site"
                             ])
                         }
                     }
