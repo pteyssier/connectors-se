@@ -56,14 +56,12 @@ function buildAndTag() {
     export LAST_IMAGE="$image"
 
     if [ -n "$DOCKER_HTML" ]; then
-        echo >> "$DOCKER_HTML" << EOF
-  <tr>
-    <td>$TALEND_REGISTRY</td>
-    <td>$imageName</td>
-    <td>$DOCKER_IMAGE_VERSION</td>
-    <td>$image</td>
-  </tr>
-EOF
+        echo "      <tr>" >> "$DOCKER_HTML"
+        echo "        <td>$TALEND_REGISTRY</td>" >> "$DOCKER_HTML"
+        echo "        <td>$imageName</td>" >> "$DOCKER_HTML"
+        echo "        <td>$DOCKER_IMAGE_VERSION</td>" >> "$DOCKER_HTML"
+        echo "        <td>$image</td>" >> "$DOCKER_HTML"
+        echo "      </tr>" >> "$DOCKER_HTML"
     fi
 }
 
