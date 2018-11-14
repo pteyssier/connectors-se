@@ -117,6 +117,15 @@
               <m2Root>${project.build.directory}/docker-m2</m2Root>
             </configuration>
           </execution>
+          <execution>
+            <id>report-conflicts</id>
+            <goals>
+              <goal>repository-report</goal>
+            </goals>
+            <configuration>
+              <skip>false</skip>
+            </configuration>
+          </execution>
         </executions>
         <configuration> <!-- parent -->
           <skip>true</skip>

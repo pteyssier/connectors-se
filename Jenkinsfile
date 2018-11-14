@@ -75,6 +75,10 @@ spec:
                             allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
                             reportDir   : 'target/talend-component-kit', reportFiles: 'icon-report.html', reportName: "Icon Report"
                     ])
+                    publishHTML(target: [
+                            allowMissing: false, alwaysLinkToLastBuild: false, keepAll: true,
+                            reportDir   : 'target/talend-component-kit', reportFiles: 'repository-dependency-report.html', reportName: "Dependencies Report"
+                    ])
                 }
             }
         }
