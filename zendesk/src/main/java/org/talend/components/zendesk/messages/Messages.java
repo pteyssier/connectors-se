@@ -13,4 +13,6 @@ public interface Messages {
 
     String healthCheckServerUrlIsEmpty();
 
+    String deleteUnsupportedType();
+
 }

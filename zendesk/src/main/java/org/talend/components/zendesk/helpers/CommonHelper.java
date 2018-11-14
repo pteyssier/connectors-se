@@ -17,4 +17,11 @@ public class CommonHelper {
         reject.emit(new Reject(e.getMessage(), record));
     }
 
+    public static long[] arrayOfObjectsToPrimitives(Long... objects) {
+        long[] primitives = new long[objects.length];
+        for (int i = 0; i < objects.length; i++)
+            primitives[i] = objects[i];
+        return primitives;
+    }
+
 }

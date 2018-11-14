@@ -2,7 +2,6 @@ package org.talend.components.zendesk.common;
 
 import lombok.Data;
 import org.talend.components.zendesk.helpers.ConfigurationHelper;
-import org.talend.components.zendesk.sources.get.SelectionType;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.type.DataSet;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;

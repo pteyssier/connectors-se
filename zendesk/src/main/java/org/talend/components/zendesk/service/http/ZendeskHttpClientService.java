@@ -3,9 +3,11 @@ package org.talend.components.zendesk.service.http;
 import lombok.extern.slf4j.Slf4j;
 import org.asynchttpclient.ListenableFuture;
 import org.talend.components.zendesk.common.ZendeskDataStore;
+import org.talend.components.zendesk.helpers.CommonHelper;
 import org.talend.components.zendesk.helpers.JsonHelper;
 import org.talend.components.zendesk.service.zendeskclient.ZendeskClientService;
 import org.talend.components.zendesk.sources.Reject;
+import org.talend.components.zendesk.sources.delete.ZendeskDeleteConfiguration;
 import org.talend.components.zendesk.sources.get.InputIterator;
 import org.talend.components.zendesk.sources.get.ZendeskGetConfiguration;
 import org.talend.components.zendesk.sources.put.PagedList;
@@ -123,13 +125,58 @@ public class ZendeskHttpClientService {
         }
     }
 
+    public void deleteTickets(ZendeskDeleteConfiguration configuration, List<Ticket> tickets, OutputEmitter<JsonObject> success,
+            OutputEmitter<Reject> reject) {
+        log.debug("delete tickets");
+        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(configuration.getDataSet().getDataStore())
+                .getZendeskServiceClient();
+        PagedList<Ticket> pagedList = new PagedList<>(tickets, MAX_ALLOWED_BATCH_SIZE);
+        List<Ticket> listPage;
+        while ((listPage = pagedList.getNextPage()) != null) {
+            deleteTicketsPage(zendeskServiceClient, listPage, success, reject);
+        }
+    }
+
+    private void deleteTicketsPage(Zendesk zendeskServiceClient, List<Ticket> tickets, OutputEmitter<JsonObject> success,
+            OutputEmitter<Reject> reject) {
+        if (tickets == null || tickets.isEmpty()) {
+            return;
+        }
+
+        Long firstId = tickets.get(0).getId();
+        Long[] idArray = tickets.stream().map(Request::getId).toArray(Long[]::new);
+        try {
+            // if (permanently) {
+            // JobStatus jobStatus = zendeskServiceClient.permanentlyDeleteTickets(firstId,
+            // CommonHelper.arrayOfObjectsToPrimitives(idArray));
+            // processJobStatus(jobStatus, zendeskServiceClient, success, reject, tickets);
+            // } else {
+            zendeskServiceClient.deleteTickets(firstId, CommonHelper.arrayOfObjectsToPrimitives(idArray));
+            tickets.forEach(ticket -> {
+                log.info("ticket was processed: " + ticket.toString());
+                JsonObject jsonObject = JsonHelper.objectToJsonObject(ticket, jsonReaderFactory);
+                success.emit(jsonObject);
+            });
+            // }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void processJobStatusFuture(ListenableFuture<JobStatus<Ticket>> future, Zendesk zendeskServiceClient,
             OutputEmitter<JsonObject> success, OutputEmitter<Reject> reject, List<Ticket> tickets)
             throws ExecutionException, InterruptedException {
         if (future == null)
             return;
-
         JobStatus<Ticket> jobStatus = future.get();
+        processJobStatus(jobStatus, zendeskServiceClient, success, reject, tickets);
+    }
+
+    private void processJobStatus(JobStatus<Ticket> jobStatus, Zendesk zendeskServiceClient, OutputEmitter<JsonObject> success,
+            OutputEmitter<Reject> reject, List<Ticket> tickets) throws InterruptedException {
+        if (jobStatus == null)
+            return;
+
         while (jobStatus.getStatus() == JobStatus.JobStatusEnum.queued
                 || jobStatus.getStatus() == JobStatus.JobStatusEnum.working) {
             sleep(1000);
@@ -137,7 +184,7 @@ public class ZendeskHttpClientService {
         }
         if (jobStatus.getStatus() == JobStatus.JobStatusEnum.completed) {
             jobStatus.getResults().forEach(ticket -> {
-                log.info("ticket was created/updated: " + ticket.toString());
+                log.info("ticket was processed: " + ticket.toString());
                 JsonObject jsonObject = JsonHelper.objectToJsonObject(ticket, jsonReaderFactory);
                 success.emit(jsonObject);
             });
