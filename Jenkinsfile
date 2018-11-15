@@ -13,32 +13,21 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
-  containers:
-    - name: main
-      image: jenkinsxio/builder-maven:0.1.60
-      command:
-      - cat
-      tty: true
-      volumeMounts:
-      - name: docker
-        mountPath: /var/run/docker.sock
-      - name: m2main
-        mountPath: /root/.m2/repository
-      resources:
-        requests:
-          memory: "1G"
-          cpu: "2"
-        limits:
-          memory: "1G"
-          cpu: "2"
-
+    containers:
+        -
+            name: main
+            image: 'jenkinsxio/builder-maven:0.1.60'
+            command: [cat]
+            tty: true
+            volumeMounts: [{name: docker, mountPath: /var/run/docker.sock}, {name: m2main, mountPath: /root/.m2/repository}]
+            resources: {requests: {memory: 1G, cpu: '2'}, limits: {memory: 1G, cpu: '2'}}
     volumes:
-    - name: docker
-      hostPath:
-        path: /var/run/docker.sock
-    - name: m2main
-      hostPath:
-        path: /tmp/jenkins/tdi/m2
+        -
+            name: docker
+            hostPath: {path: /var/run/docker.sock}
+        -
+            name: m2main
+            hostPath: {path: /tmp/jenkins/tdi/m2}
 """
         }
     }
