@@ -20,7 +20,7 @@ spec:
             command: [cat]
             tty: true
             volumeMounts: [{name: docker, mountPath: /var/run/docker.sock}, {name: m2main, mountPath: /root/.m2/repository}]
-            resources: {requests: {memory: 2G, cpu: '2'}, limits: {memory: 2G, cpu: '2'}}
+            resources: {requests: {memory: 3G, cpu: '2'}, limits: {memory: 3G, cpu: '2'}}
     volumes:
         -
             name: docker
