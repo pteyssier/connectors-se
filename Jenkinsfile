@@ -24,22 +24,20 @@ spec:
         mountPath: /var/run/docker.sock
       - name: m2main
         mountPath: /root/.m2/repository
-
-  volumes:
-  - name: docker
-    hostPath:
-      path: /var/run/docker.sock
-  - name: m2main
-    hostPath:
-      path: /tmp/jenkins/tdi/m2
-
-  resources:
-    requests:
-      memory: "1G"
-        cpu: "500m"
-    limits:
-      memory: "2G"
-        cpu: "2"
+    volumes:
+    - name: docker
+      hostPath:
+        path: /var/run/docker.sock
+    - name: m2main
+      hostPath:
+        path: /tmp/jenkins/tdi/m2
+    resources:
+      requests:
+        memory: "1G"
+          cpu: "2"
+      limits:
+        memory: "1G"
+          cpu: "2"
 """
         }
     }
