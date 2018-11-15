@@ -27,10 +27,10 @@ spec:
       resources:
         requests:
           memory: "1G"
-            cpu: "2"
+          cpu: "2"
         limits:
           memory: "1G"
-            cpu: "2"
+          cpu: "2"
 
     volumes:
     - name: docker
