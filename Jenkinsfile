@@ -32,6 +32,14 @@ spec:
   - name: m2main
     hostPath:
       path: /tmp/jenkins/tdi/m2
+
+  resources:
+    requests:
+      memory: "1G"
+        cpu: "500m"
+    limits:
+      memory: "2G"
+        cpu: "2"
 """
         }
     }
