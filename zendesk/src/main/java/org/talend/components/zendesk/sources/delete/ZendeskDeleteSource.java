@@ -5,7 +5,6 @@ import org.talend.components.zendesk.common.SelectionType;
 import org.talend.components.zendesk.helpers.ConfigurationHelper;
 import org.talend.components.zendesk.helpers.JsonHelper;
 import org.talend.components.zendesk.messages.Messages;
-import org.talend.components.zendesk.service.http.ZendeskAuthHttpClientService;
 import org.talend.components.zendesk.service.http.ZendeskHttpClientService;
 import org.talend.components.zendesk.sources.Reject;
 import org.talend.sdk.component.api.component.Icon;
@@ -43,8 +42,7 @@ public class ZendeskDeleteSource implements Serializable {
     private Messages i18n;
 
     public ZendeskDeleteSource(@Option("configuration") final ZendeskDeleteConfiguration configuration,
-            final ZendeskHttpClientService zendeskHttpClientService,
-            final ZendeskAuthHttpClientService zendeskAuthHttpClientService, final Messages i18n) {
+            final ZendeskHttpClientService zendeskHttpClientService, final Messages i18n) {
         this.configuration = configuration;
         this.zendeskHttpClientService = zendeskHttpClientService;
         this.i18n = i18n;

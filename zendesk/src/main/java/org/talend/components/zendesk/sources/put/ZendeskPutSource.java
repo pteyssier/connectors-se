@@ -1,13 +1,12 @@
 package org.talend.components.zendesk.sources.put;
 
 import lombok.extern.slf4j.Slf4j;
+import org.talend.components.zendesk.common.SelectionType;
 import org.talend.components.zendesk.helpers.CommonHelper;
 import org.talend.components.zendesk.helpers.ConfigurationHelper;
 import org.talend.components.zendesk.helpers.JsonHelper;
-import org.talend.components.zendesk.service.http.ZendeskAuthHttpClientService;
 import org.talend.components.zendesk.service.http.ZendeskHttpClientService;
 import org.talend.components.zendesk.sources.Reject;
-import org.talend.components.zendesk.common.SelectionType;
 import org.talend.sdk.component.api.component.Icon;
 import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
@@ -32,7 +31,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Version(1)
 @Icon(value = Icon.IconType.CUSTOM, custom = "zendesk_put")
-@Processor(name = "Put")
+@Processor(name = "Output")
 @Documentation("Data put processor")
 public class ZendeskPutSource implements Serializable {
 
@@ -43,8 +42,7 @@ public class ZendeskPutSource implements Serializable {
     private List<JsonObject> batchData = new ArrayList<>();
 
     public ZendeskPutSource(@Option("configuration") final ZendeskPutConfiguration configuration,
-            final ZendeskHttpClientService zendeskHttpClientService,
-            final ZendeskAuthHttpClientService zendeskAuthHttpClientService) {
+            final ZendeskHttpClientService zendeskHttpClientService) {
         this.configuration = configuration;
         this.zendeskHttpClientService = zendeskHttpClientService;
         ConfigurationHelper.setupServices();

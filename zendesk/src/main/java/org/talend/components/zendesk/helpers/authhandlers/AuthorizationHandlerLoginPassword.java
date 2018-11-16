@@ -1,7 +1,6 @@
 package org.talend.components.zendesk.helpers.authhandlers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.talend.components.zendesk.common.ZendeskDataStore;
 import org.talend.sdk.component.api.service.Service;
 
 @Slf4j
@@ -19,12 +18,12 @@ public class AuthorizationHandlerLoginPassword implements AuthorizationHandler {
     // cachedTokens.remove(authenticationLoginPasswordConfiguration);
     // }
 
-    @Override
-    public String getAuthorization(ZendeskDataStore zendeskDataStore) {
-        // String accessToken = getCachedToken(zendeskDataStore);
-        // return BEARER + accessToken;
-        return "";
-    }
+    // @Override
+    // public String getAuthorization(ZendeskDataStore zendeskDataStore) {
+    // // String accessToken = getCachedToken(zendeskDataStore);
+    // // return BEARER + accessToken;
+    // return "";
+    // }
 
     // String getCachedToken(ZendeskDataStore zendeskDataStore) throws UnknownAuthenticationTypeException {
     // AuthenticationLoginPasswordConfiguration authSettings = (AuthenticationLoginPasswordConfiguration) zendeskDataStore

@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Data
 @GridLayout({ @GridLayout.Row({ "dataSet" }) })
 @GridLayout(names = GridLayout.FormType.ADVANCED, value = { @GridLayout.Row({ "useBatch" }) })
-@Documentation("'Put component' configuration")
+@Documentation("'Output component' configuration")
 public class ZendeskPutConfiguration implements Serializable {
 
     @Option

@@ -7,7 +7,6 @@ import org.talend.components.zendesk.common.ZendeskDataSet;
 import org.talend.components.zendesk.common.ZendeskDataStore;
 import org.talend.components.zendesk.helpers.ConfigurationHelper;
 import org.talend.components.zendesk.messages.Messages;
-import org.talend.components.zendesk.service.http.ZendeskAuthHttpClientService;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.api.service.Service;
@@ -36,9 +35,6 @@ public class ZendeskService {
 
     @Service
     private RecordBuilderFactory recordBuilderFactory;
-
-    @Service
-    private ZendeskAuthHttpClientService zendeskAuthHttpClientService;
 
     @DiscoverSchema(ConfigurationHelper.DISCOVER_SCHEMA_LIST_ID)
     public Schema guessTableSchemaList(final ZendeskDataSet dataSet) {
@@ -75,7 +71,7 @@ public class ZendeskService {
         JsonProperty annotation = parentClass.getMethod("get" + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1))
                 .getAnnotation(JsonProperty.class);
 
-        if (annotation != null) {
+        if (annotation != null && !annotation.value().isEmpty()) {
             fieldName = annotation.value();
         }
         return fieldName;

@@ -11,7 +11,7 @@ import javax.json.JsonObject;
 import java.io.Serializable;
 
 @Slf4j
-@Documentation("Get data processor")
+@Documentation("Input data processor")
 public class ZendeskGetSource implements Serializable {
 
     private final ZendeskGetConfiguration configuration;

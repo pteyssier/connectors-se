@@ -3,6 +3,7 @@ package org.talend.components.zendesk;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.talend.components.zendesk.common.AuthenticationApiTokenConfiguration;
 import org.talend.components.zendesk.common.AuthenticationLoginPasswordConfiguration;
 import org.talend.components.zendesk.common.AuthenticationType;
 import org.talend.components.zendesk.common.ZendeskDataStore;
@@ -17,12 +18,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ZendeskTest {
 
     @Test
-    public void testConnection() throws UnknownAuthenticationTypeException {
-        AuthenticationLoginPasswordConfiguration authenticationLoginPasswordConfiguration = new AuthenticationLoginPasswordConfiguration();
+    public void testConnectionLoginPassword() throws UnknownAuthenticationTypeException {
+        AuthenticationLoginPasswordConfiguration authenticationConfiguration = new AuthenticationLoginPasswordConfiguration();
         ZendeskDataStore zendeskDataStore;
-        zendeskDataStore = new ZendeskDataStore(null, AuthenticationType.LOGIN_PASSWORD, authenticationLoginPasswordConfiguration,
-                null);
-        assertEquals(authenticationLoginPasswordConfiguration, zendeskDataStore.getAuthSettings());
+        zendeskDataStore = new ZendeskDataStore(null, AuthenticationType.LOGIN_PASSWORD, authenticationConfiguration, null);
+        assertEquals(authenticationConfiguration, zendeskDataStore.getAuthSettings());
     }
 
+    @Test
+    public void testConnectionApiToken() throws UnknownAuthenticationTypeException {
+        AuthenticationApiTokenConfiguration authenticationConfiguration = new AuthenticationApiTokenConfiguration();
+        ZendeskDataStore zendeskDataStore;
+        zendeskDataStore = new ZendeskDataStore(null, AuthenticationType.API_TOKEN, null, authenticationConfiguration);
+        assertEquals(authenticationConfiguration, zendeskDataStore.getAuthSettings());
+    }
 }

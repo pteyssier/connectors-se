@@ -1,18 +1,35 @@
 package org.talend.components.zendesk;
 
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.talend.components.zendesk.service.http.ZendeskAuthHttpClientService;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.talend.components.zendesk.common.ZendeskDataStore;
+import org.talend.components.zendesk.helpers.JsonHelper;
 import org.talend.components.zendesk.service.http.ZendeskHttpClientService;
+import org.talend.components.zendesk.sources.delete.ZendeskDeleteConfiguration;
+import org.talend.components.zendesk.sources.get.InputIterator;
+import org.talend.components.zendesk.sources.get.ZendeskGetConfiguration;
+import org.talend.components.zendesk.sources.put.ZendeskPutConfiguration;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.junit.BaseComponentsHandler;
+import org.talend.sdk.component.junit.SimpleFactory;
 import org.talend.sdk.component.junit5.Injected;
 import org.talend.sdk.component.junit5.WithComponents;
+import org.talend.sdk.component.runtime.manager.chain.Job;
+import org.zendesk.client.v2.model.Ticket;
 
 import javax.json.JsonBuilderFactory;
+import javax.json.JsonObject;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Stream;
 
 @Slf4j
 @DisplayName("Suite of test for the Zendesk components")
@@ -21,16 +38,11 @@ import javax.json.JsonBuilderFactory;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ZendeskTestIT {
 
-    private static final String TEMP_DIR = System.getProperty("java.io.tmpdir");
-
     @Injected
     private BaseComponentsHandler componentsHandler;
 
     @Service
     private JsonBuilderFactory jsonBuilderFactory;
-
-    @Service
-    private ZendeskAuthHttpClientService zendeskAuthHttpClientService;
 
     @Service
     private ZendeskHttpClientService zendeskHttpClientService;
@@ -43,330 +55,147 @@ class ZendeskTestIT {
         this.testContext = testContext;
     }
 
-    // @Test
-    // @DisplayName("List. Get files in directory")
-    // void listComponentGetFilesInDirectory() {
-    // log.info("Integration test 'List. Get files in directory' start ");
-    // OneDriveListConfiguration dataSet = new OneDriveListConfiguration();
-    // dataSet.setDataStore(testContext.getDataStoreLoginPassword());
-    // dataSet.setObjectPath("/integr-tests/get");
-    // dataSet.setObjectType(OneDriveObjectType.DIRECTORY);
-    // dataSet.setRecursively(true);
-    //
-    // final String config = configurationByExample().forInstance(dataSet).configured().toQueryString();
-    // Job.components().component("zendesk-list", "Zendesk://List?" + config).component("collector", "test://collector")
-    // .connections().from("zendesk-list").to("collector").build().run();
-    // final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
-    // Assertions.assertEquals(2, res.size());
-    // Assertions.assertTrue("gettest1.txt,gettest2.txt".contains(res.get(0).getString("name")));
-    // Assertions.assertTrue("gettest1.txt,gettest2.txt".contains(res.get(1).getString("name")));
-    // }
-    //
-    // @Test
-    // @DisplayName("List. Get root")
-    // void listComponentGetRoot() {
-    // log.info("Integration test 'List. Get root' start ");
-    // OneDriveListConfiguration dataSet = new OneDriveListConfiguration();
-    // dataSet.setDataStore(testContext.getDataStoreLoginPassword());
-    //
-    // final String config = configurationByExample().forInstance(dataSet).configured().toQueryString();
-    // Job.components().component("onedrive-list", "OneDrive://List?" + config).component("collector", "test://collector")
-    // .connections().from("onedrive-list").to("collector").build().run();
-    // final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
-    // Assertions.assertEquals(1, res.size());
-    // Assertions.assertEquals("root", res.iterator().next().getString("name"));
-    // }
-    //
-    // @Test
-    // @DisplayName("Create. Create folder")
-    // void createComponentCreateFolder() {
-    // log.info("Integration test 'Create. Create folder' start.");
-    // String fileName = "newFile.txt";
-    // String filePath = "integr-tests/create/dir1/dir1_2";
-    // // create config
-    // OneDriveCreateConfiguration dataSetCreate = new OneDriveCreateConfiguration();
-    // dataSetCreate.setDataStore(testContext.getDataStoreLoginPassword());
-    // dataSetCreate.setCreateDirectoriesByList(false);
-    // dataSetCreate.setObjectType(OneDriveObjectType.FILE);
-    // dataSetCreate.setObjectPath(filePath + "/" + fileName);
-    // final String configCreate = configurationByExample().forInstance(dataSetCreate).configured().toQueryString();
-    //
-    // ConfigurationHelper.setupServices(zendeskAuthHttpClientService);
-    // DriveItem root = zendeskHttpClientService.getRoot(testContext.getDataStoreLoginPassword());
-    // String parentId = root.id;
-    // JsonObject jsonObject = jsonBuilderFactory.createObjectBuilder().add("parentId", parentId).build();
-    // componentsHandler.setInputData(Arrays.asList(jsonObject));
-    //
-    // Job.components().component("emitter", "test://emitter").component("onedrive-create", "OneDrive://Create?" + configCreate)
-    // .component("collector", "test://collector").connections().from("emitter").to("onedrive-create")
-    // .from("onedrive-create").to("collector").build().run();
-    // final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
-    // Assertions.assertEquals(1, res.size());
-    // JsonObject newItem = res.get(0);
-    // Assertions.assertTrue(newItem.containsKey("file"));
-    // Assertions.assertEquals(fileName, newItem.getString("name"));
-    // Assertions.assertEquals("/drive/root:/" + filePath, newItem.getJsonObject("parentReference").getString("path"));
-    // }
-    //
-    // @Test
-    // @DisplayName("Create. Create folder list")
-    // void createComponentCreateFolderList() {
-    // log.info("Integration test 'Create. Create folder list' start.");
-    // // create config
-    // OneDriveCreateConfiguration dataSetCreate = new OneDriveCreateConfiguration();
-    // dataSetCreate.setDataStore(testContext.getDataStoreLoginPassword());
-    // dataSetCreate.setCreateDirectoriesByList(true);
-    // final String configCreate = configurationByExample().forInstance(dataSetCreate).configured().toQueryString();
-    //
-    // JsonObject jsonObject1 = jsonBuilderFactory.createObjectBuilder().add("objectPath", "integr-tests/create/dir2").build();
-    // JsonObject jsonObject2 = jsonBuilderFactory.createObjectBuilder().add("objectPath", "integr-tests/create/dir3/dir3_1")
-    // .build();
-    // componentsHandler.setInputData(Arrays.asList(jsonObject1, jsonObject2));
-    //
-    // Job.components().component("emitter", "test://emitter").component("onedrive-create", "OneDrive://Create?" + configCreate)
-    // .component("collector", "test://collector").connections().from("emitter").to("onedrive-create")
-    // .from("onedrive-create").to("collector").build().run();
-    // final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
-    // Assertions.assertEquals(2, res.size());
-    //
-    // Map<String, String> resMap1 = new HashMap<>();
-    // resMap1.put("file", null);
-    // resMap1.put("name", "dir2");
-    // resMap1.put("parentPath", "/drive/root:/integr-tests/create");
-    // Map<String, String> resMap2 = new HashMap<>();
-    // resMap2.put("file", null);
-    // resMap2.put("name", "dir3_1");
-    // resMap2.put("parentPath", "/drive/root:/integr-tests/create/dir3");
-    // List<Map<String, String>> goodResult = Arrays.asList(resMap1, resMap2);
-    //
-    // List<Map<String, String>> result = res.stream().map(item -> {
-    // Map<String, String> resMap = new HashMap<>();
-    // resMap.put("file", item.containsKey("file") ? "" : null);
-    // resMap.put("name", item.getString("name"));
-    // resMap.put("parentPath", item.getJsonObject("parentReference").getString("path"));
-    // return resMap;
-    // }).collect(Collectors.toList());
-    // Assertions.assertEquals(goodResult, result);
-    // }
-    //
-    // @Test
-    // @DisplayName("Delete. Delete all files in folder")
-    // void deleteComponentAllFilesInFolder() throws IOException {
-    // log.info("Integration test 'Delete. All files in folder.");
-    // // create config
-    // OneDriveDeleteConfiguration dataSet = new OneDriveDeleteConfiguration();
-    // dataSet.setDataStore(testContext.getDataStoreLoginPassword());
-    // final String config = configurationByExample().forInstance(dataSet).configured().toQueryString();
-    //
-    // ConfigurationHelper.setupServices(zendeskAuthHttpClientService);
-    // DriveItem newFile = zendeskHttpClientService.createItem(testContext.getDataStoreLoginPassword(), null,
-    // OneDriveObjectType.FILE, "integr-tests/delete/dir1/newFile.txt");
-    // DriveItem newFolder = zendeskHttpClientService.getItemByPath(testContext.getDataStoreLoginPassword(),
-    // "integr-tests/delete/dir1");
-    // JsonObject jsonObject1 = jsonBuilderFactory.createObjectBuilder().add("id", newFile.id).build();
-    // JsonObject jsonObject2 = jsonBuilderFactory.createObjectBuilder().add("id", newFolder.id).build();
-    // componentsHandler.setInputData(Arrays.asList(jsonObject1, jsonObject2));
-    //
-    // Job.components().component("emitter", "test://emitter").component("onedrive-delete", "OneDrive://Delete?" + config)
-    // .component("collector", "test://collector").connections().from("emitter").to("onedrive-delete")
-    // .from("onedrive-delete").to("collector").build().run();
-    // final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
-    // Assertions.assertEquals(2, res.size());
-    // }
-    //
-    // @Test
-    // @DisplayName("Get. Get files to folder")
-    // void getComponentFilesToFolder() throws IOException {
-    // log.info("Integration test 'Get. Files to folder. Destination: " + TEMP_DIR);
-    // // create config
-    // ZendeskGetConfiguration dataSet = new ZendeskGetConfiguration();
-    // dataSet.setDataStore(testContext.getDataStoreLoginPassword());
-    // dataSet.setStoreFilesLocally(true);
-    // dataSet.setStoreDirectory(TEMP_DIR);
-    // final String config = configurationByExample().forInstance(dataSet).configured().toQueryString();
-    //
-    // ConfigurationHelper.setupServices(zendeskAuthHttpClientService);
-    // String filePath1 = "integr-tests/get/gettest1.txt";
-    // String filePath2 = "integr-tests/get/gettest2.txt";
-    // DriveItem file1 = zendeskHttpClientService.getItemByPath(testContext.getDataStoreLoginPassword(), filePath1);
-    // DriveItem file2 = zendeskHttpClientService.getItemByPath(testContext.getDataStoreLoginPassword(), filePath2);
-    // JsonObject jsonObject1 = jsonBuilderFactory.createObjectBuilder().add("id", file1.id).build();
-    // JsonObject jsonObject2 = jsonBuilderFactory.createObjectBuilder().add("id", file2.id).build();
-    // componentsHandler.setInputData(Arrays.asList(jsonObject1, jsonObject2));
-    //
-    // Job.components().component("emitter", "test://emitter").component("onedrive-get", "OneDrive://Get?" + config)
-    // .component("collector", "test://collector").connections().from("emitter").to("onedrive-get").from("onedrive-get")
-    // .to("collector").build().run();
-    // final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
-    //
-    // byte[] fileBytes1 = Files.readAllBytes(Paths.get(TEMP_DIR + "/" + filePath1));
-    // Assertions.assertEquals("get test file 1 content", new String(fileBytes1, StringHelper.STRING_CHARSET));
-    // byte[] fileBytes2 = Files.readAllBytes(Paths.get(TEMP_DIR + "/" + filePath2));
-    // Assertions.assertEquals("get test file 2 content", new String(fileBytes2, StringHelper.STRING_CHARSET));
-    // }
-    //
-    // @Test
-    // @DisplayName("Get. Get files to byte array")
-    // void getComponentFilesToByteArray() throws IOException {
-    // log.info("Integration test 'Get. Files to byte array.");
-    // // create config
-    // ZendeskGetConfiguration dataSet = new ZendeskGetConfiguration();
-    // dataSet.setDataStore(testContext.getDataStoreLoginPassword());
-    // dataSet.setStoreFilesLocally(false);
-    // final String config = configurationByExample().forInstance(dataSet).configured().toQueryString();
-    //
-    // ConfigurationHelper.setupServices(zendeskAuthHttpClientService);
-    // String filePath1 = "integr-tests/get/gettest1.txt";
-    // String fileContentOrigin1 = "get test file 1 content";
-    // String filePath2 = "integr-tests/get/gettest2.txt";
-    // String fileContentOrigin2 = "get test file 2 content";
-    //
-    // // create files
-    // zendeskHttpClientService.putItemData(testContext.getDataStoreLoginPassword(), filePath1,
-    // new ByteArrayInputStream(fileContentOrigin1.getBytes()), fileContentOrigin1.length());
-    // zendeskHttpClientService.putItemData(testContext.getDataStoreLoginPassword(), filePath2,
-    // new ByteArrayInputStream(fileContentOrigin2.getBytes()), fileContentOrigin2.length());
-    //
-    // DriveItem file1 = zendeskHttpClientService.getItemByPath(testContext.getDataStoreLoginPassword(), filePath1);
-    // DriveItem file2 = zendeskHttpClientService.getItemByPath(testContext.getDataStoreLoginPassword(), filePath2);
-    // JsonObject jsonObject1 = jsonBuilderFactory.createObjectBuilder().add("id", file1.id).build();
-    // JsonObject jsonObject2 = jsonBuilderFactory.createObjectBuilder().add("id", file2.id).build();
-    // componentsHandler.setInputData(Arrays.asList(jsonObject1, jsonObject2));
-    //
-    // Job.components().component("emitter", "test://emitter").component("onedrive-get", "OneDrive://Get?" + config)
-    // .component("collector", "test://collector").connections().from("emitter").to("onedrive-get").from("onedrive-get")
-    // .to("collector").build().run();
-    // final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
-    //
-    // Assertions.assertEquals(2, res.size());
-    // Map<String, String> fileData = Collections
-    // .unmodifiableMap(res.stream().collect(Collectors.toMap(i -> i.getString("id"), i -> i.getString("payload"))));
-    // String fileContent1 = new String(Base64.getDecoder().decode(fileData.get(file1.id)), StringHelper.STRING_CHARSET);
-    // String fileContent2 = new String(Base64.getDecoder().decode(fileData.get(file2.id)), StringHelper.STRING_CHARSET);
-    // Assertions.assertEquals(fileContentOrigin1, fileContent1);
-    // Assertions.assertEquals(fileContentOrigin2, fileContent2);
-    // }
-    //
-    // @Test
-    // @DisplayName("Get. Get files to byte array")
-    // void getComponentFolder() throws IOException {
-    // log.info("Integration test 'Get. Files to byte array.");
-    // // create config
-    // ZendeskGetConfiguration dataSet = new ZendeskGetConfiguration();
-    // dataSet.setDataStore(testContext.getDataStoreLoginPassword());
-    // dataSet.setStoreFilesLocally(false);
-    // final String config = configurationByExample().forInstance(dataSet).configured().toQueryString();
-    //
-    // ConfigurationHelper.setupServices(zendeskAuthHttpClientService);
-    // String folderPath1 = "integr-tests/get";
-    //
-    // // create dir
-    // zendeskHttpClientService.createItem(testContext.getDataStoreLoginPassword(), null, OneDriveObjectType.DIRECTORY,
-    // folderPath1);
-    //
-    // DriveItem folder1 = zendeskHttpClientService.getItemByPath(testContext.getDataStoreLoginPassword(), folderPath1);
-    // JsonObject jsonObject3 = jsonBuilderFactory.createObjectBuilder().add("id", folder1.id).build();
-    // componentsHandler.setInputData(Arrays.asList(jsonObject3));
-    //
-    // Job.components().component("emitter", "test://emitter").component("onedrive-get", "OneDrive://Get?" + config)
-    // .component("collector", "test://collector").connections().from("emitter").to("onedrive-get").from("onedrive-get")
-    // .to("collector").build().run();
-    // final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
-    //
-    // Assertions.assertEquals(1, res.size());
-    // }
-    //
-    // @Test
-    // @DisplayName("Put. Put files from folder")
-    // void putComponentFilesFromFolder() throws IOException {
-    // log.info("Integration test 'Put. Files from folder. Source: " + TEMP_DIR);
-    // // create config
-    // ZendeskPutConfiguration dataSet = new ZendeskPutConfiguration();
-    // dataSet.setDataStore(testContext.getDataStoreLoginPassword());
-    // dataSet.setLocalSource(true);
-    // final String config = configurationByExample().forInstance(dataSet).configured().toQueryString();
-    //
-    // String folderPath = "integr-tests/put";
-    // String filePath1 = "integr-tests/put/puttest1.txt";
-    // String filePath2 = "integr-tests/put/puttest2.txt";
-    // if (!new File(TEMP_DIR, folderPath).exists()) {
-    // Files.createDirectories(Paths.get(TEMP_DIR + "/" + folderPath));
-    // }
-    // for (String filePath : new String[] { filePath1, filePath2 }) {
-    // try (InputStream stream = getClass().getResourceAsStream("/" + filePath);
-    // OutputStream resStreamOut = new FileOutputStream(TEMP_DIR + "/" + filePath)) {
-    // int readBytes;
-    // byte[] buffer = new byte[4096];
-    // while ((readBytes = stream.read(buffer)) > 0) {
-    // resStreamOut.write(buffer, 0, readBytes);
-    // }
-    // }
-    // }
-    //
-    // ConfigurationHelper.setupServices(zendeskAuthHttpClientService);
-    // List<JsonObject> inputData = new ArrayList<>();
-    //
-    // JsonObject jsonObject = jsonBuilderFactory.createObjectBuilder().add("itemPath", folderPath).addNull("localPath").build();
-    // inputData.add(jsonObject);
-    // for (String filePath : new String[] { filePath1, filePath2 }) {
-    // jsonObject = jsonBuilderFactory.createObjectBuilder().add("itemPath", filePath)
-    // .add("localPath", TEMP_DIR + "/" + filePath).build();
-    // inputData.add(jsonObject);
-    // }
-    // componentsHandler.setInputData(inputData);
-    //
-    // Job.components().component("emitter", "test://emitter").component("onedrive-put", "OneDrive://Put?" + config)
-    // .component("collector", "test://collector").connections().from("emitter").to("onedrive-put").from("onedrive-put")
-    // .to("collector").build().run();
-    // final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
-    //
-    // Assertions.assertEquals(3, res.size());
-    // }
-    //
-    // @Test
-    // @DisplayName("Put. Put files from byte array")
-    // void putComponentFilesFromByteArray() throws IOException {
-    // log.info("Integration test 'Put. Files from byte array.");
-    // // create config
-    // ZendeskPutConfiguration dataSet = new ZendeskPutConfiguration();
-    // dataSet.setDataStore(testContext.getDataStoreLoginPassword());
-    // dataSet.setLocalSource(false);
-    // final String config = configurationByExample().forInstance(dataSet).configured().toQueryString();
-    //
-    // String folderPath = "integr-tests/putbytes";
-    // String filePath1 = "integr-tests/putbytes/puttest1.txt";
-    // String filePath2 = "integr-tests/putbytes/puttest2.txt";
-    // Map<String, String> payloads = new HashMap<>();
-    // for (String filePath : new String[] { filePath1, filePath2 }) {
-    // try (InputStream stream = getClass().getResourceAsStream("/" + filePath);
-    // ByteArrayOutputStream resStreamOut = new ByteArrayOutputStream()) {
-    // int readBytes;
-    // byte[] buffer = new byte[4096];
-    // while ((readBytes = stream.read(buffer)) > 0) {
-    // resStreamOut.write(buffer, 0, readBytes);
-    // }
-    // payloads.put(filePath, Base64.getEncoder().encodeToString(resStreamOut.toByteArray()));
-    // }
-    // }
-    //
-    // ConfigurationHelper.setupServices(zendeskAuthHttpClientService);
-    // List<JsonObject> inputData = new ArrayList<>();
-    //
-    // JsonObject jsonObject = jsonBuilderFactory.createObjectBuilder().add("itemPath", folderPath).addNull("payload").build();
-    // inputData.add(jsonObject);
-    // for (Map.Entry<String, String> payload : payloads.entrySet()) {
-    // jsonObject = jsonBuilderFactory.createObjectBuilder().add("itemPath", payload.getKey())
-    // .add("payload", payload.getValue()).build();
-    // inputData.add(jsonObject);
-    // }
-    // componentsHandler.setInputData(inputData);
-    //
-    // Job.components().component("emitter", "test://emitter").component("onedrive-put", "OneDrive://Put?" + config)
-    // .component("collector", "test://collector").connections().from("emitter").to("onedrive-put").from("onedrive-put")
-    // .to("collector").build().run();
-    // final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
-    //
-    // Assertions.assertEquals(3, res.size());
-    // }
+    @ParameterizedTest
+    @MethodSource("methodSourceDataStores")
+    @DisplayName("Input. Get ticket by id")
+    void inputComponentGetTicket(ZendeskDataStore dataStoreCustom) {
+        log.info("Integration test 'Input. Get ticket by id'. Data store: " + dataStoreCustom);
+
+        JsonObject ticket = getFirstTicket(dataStoreCustom);
+        int firstTicketId = ticket.getInt("id");
+
+        ZendeskGetConfiguration zendeskGetConfiguration = new ZendeskGetConfiguration();
+        zendeskGetConfiguration.setDataSet(ZendeskTestHelper.getTicketDataSet(dataStoreCustom));
+        zendeskGetConfiguration.setQueryString(Integer.toString(firstTicketId));
+        final String config = SimpleFactory.configurationByExample().forInstance(zendeskGetConfiguration).configured()
+                .toQueryString();
+        Job.components().component("zendesk-input", "Zendesk://Input?" + config).component("collector", "test://collector")
+                .connections().from("zendesk-input").to("collector").build().run();
+        final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
+        Assertions.assertEquals(1, res.size());
+        Assertions.assertEquals(1, res.get(0).getInt("id"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("methodSourceDataStores")
+    @DisplayName("Output. Write custom ticket")
+    void outputComponentUpdate(ZendeskDataStore dataStoreCustom) {
+        log.info("Integration test 'Output. Write custom ticket'. Data store: " + dataStoreCustom);
+
+        JsonObject ticket = getFirstTicket(dataStoreCustom);
+        int firstTicketId = ticket.getInt("id");
+
+        ZendeskPutConfiguration zendeskPutConfiguration = new ZendeskPutConfiguration();
+        zendeskPutConfiguration.setDataSet(ZendeskTestHelper.getTicketDataSet(dataStoreCustom));
+        final String config = SimpleFactory.configurationByExample().forInstance(zendeskPutConfiguration).configured()
+                .toQueryString();
+
+        String newSubject = "Updated subject. " + new Date();
+        JsonObject jsonObject = jsonBuilderFactory.createObjectBuilder().add("id", firstTicketId).add("subject", newSubject)
+                .build();
+        componentsHandler.setInputData(Arrays.asList(jsonObject));
+
+        Job.components().component("emitter", "test://emitter").component("zendesk-output", "Zendesk://Output?" + config)
+                .component("collector", "test://collector").connections().from("emitter").to("zendesk-output")
+                .from("zendesk-output").to("collector").build().run();
+        final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
+        Assertions.assertEquals(1, res.size());
+        Assertions.assertEquals(newSubject, res.get(0).getString("subject"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("methodSourceDataStores")
+    @DisplayName("Output. Write custom ticket")
+    void outputComponentCreate(ZendeskDataStore dataStoreCustom) {
+        log.info("Integration test 'Output. Write custom ticket'. Data store: " + dataStoreCustom);
+
+        JsonObject ticket = getFirstTicket(dataStoreCustom);
+        int firstTicketId = ticket.getInt("id");
+
+        ZendeskPutConfiguration zendeskPutConfiguration = new ZendeskPutConfiguration();
+        zendeskPutConfiguration.setDataSet(ZendeskTestHelper.getTicketDataSet(dataStoreCustom));
+        final String config = SimpleFactory.configurationByExample().forInstance(zendeskPutConfiguration).configured()
+                .toQueryString();
+
+        JsonObject jsonObject = jsonBuilderFactory.createObjectBuilder(ticket).remove("id").remove("forum_topic_id").build();
+        componentsHandler.setInputData(Arrays.asList(jsonObject));
+
+        Job.components().component("emitter", "test://emitter").component("zendesk-output", "Zendesk://Output?" + config)
+                .component("collector", "test://collector").connections().from("emitter").to("zendesk-output")
+                .from("zendesk-output").to("collector").build().run();
+        final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
+        Assertions.assertEquals(1, res.size());
+        Assertions.assertNotNull(res.get(0).getInt("id"));
+        Assertions.assertNotEquals(firstTicketId, res.get(0).getInt("id"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("methodSourceDataStores")
+    @DisplayName("Delete. Delete new ticket")
+    void deleteComponent(ZendeskDataStore dataStoreCustom) {
+        log.info("Integration test 'Delete. Delete new ticket'. Data store: " + dataStoreCustom);
+
+        JsonObject ticket = createTicketDirectly(dataStoreCustom);
+        Integer newTicketId = ticket.getInt("id");
+        Assertions.assertNotNull(newTicketId);
+
+        ZendeskDeleteConfiguration zendeskDeleteConfiguration = new ZendeskDeleteConfiguration();
+        zendeskDeleteConfiguration.setDataSet(ZendeskTestHelper.getTicketDataSet(dataStoreCustom));
+        final String config = SimpleFactory.configurationByExample().forInstance(zendeskDeleteConfiguration).configured()
+                .toQueryString();
+
+        JsonObject jsonObject = jsonBuilderFactory.createObjectBuilder().add("id", newTicketId).build();
+        componentsHandler.setInputData(Arrays.asList(jsonObject));
+
+        Job.components().component("emitter", "test://emitter").component("zendesk-delete", "Zendesk://Delete?" + config)
+                .component("collector", "test://collector").connections().from("emitter").to("zendesk-delete")
+                .from("zendesk-delete").to("collector").build().run();
+
+        JsonObject oldTicket = getTicketById(dataStoreCustom, newTicketId);
+        Assertions.assertNull(oldTicket);
+    }
+
+    private Stream<Arguments> methodSourceDataStores() {
+        return testContext.getDataStores();
+    }
+
+    private JsonObject getFirstTicket(ZendeskDataStore dataStore) {
+        ZendeskGetConfiguration zendeskGetConfiguration = new ZendeskGetConfiguration();
+        zendeskGetConfiguration.setDataSet(ZendeskTestHelper.getTicketDataSet(dataStore));
+
+        InputIterator ticketIterator = zendeskHttpClientService.getTickets(zendeskGetConfiguration);
+        if (!ticketIterator.hasNext()) {
+            throw new RuntimeException("No tickets found");
+        }
+        return ticketIterator.next();
+    }
+
+    private JsonObject getTicketById(ZendeskDataStore dataStore, Integer ticketId) {
+        ZendeskGetConfiguration zendeskGetConfiguration = new ZendeskGetConfiguration();
+        zendeskGetConfiguration.setDataSet(ZendeskTestHelper.getTicketDataSet(dataStore));
+        zendeskGetConfiguration.setQueryString(ticketId.toString());
+
+        InputIterator ticketIterator = zendeskHttpClientService.getTickets(zendeskGetConfiguration);
+        if (!ticketIterator.hasNext()) {
+            return null;
+        }
+        return ticketIterator.next();
+    }
+
+    private JsonObject createTicketDirectly(ZendeskDataStore dataStore) {
+        JsonObject ticketJson = getFirstTicket(dataStore);
+        Ticket ticket = JsonHelper.jsonObjectToObjectInstance(ticketJson, Ticket.class);
+        ticket.setId(null);
+        ticket.setForumTopicId(null);
+
+        ZendeskGetConfiguration zendeskGetConfiguration = new ZendeskGetConfiguration();
+        zendeskGetConfiguration.setDataSet(ZendeskTestHelper.getTicketDataSet(dataStore));
+
+        JsonObject newTicket = zendeskHttpClientService.putTicket(dataStore, ticket);
+        if (newTicket == null) {
+            throw new RuntimeException("Ticket creating error");
+        }
+        return newTicket;
+    }
 
 }

@@ -1,7 +1,6 @@
 package org.talend.components.zendesk.sources.get;
 
 import org.talend.components.zendesk.helpers.ConfigurationHelper;
-import org.talend.components.zendesk.service.http.ZendeskAuthHttpClientService;
 import org.talend.components.zendesk.service.http.ZendeskHttpClientService;
 import org.talend.sdk.component.api.component.Icon;
 import org.talend.sdk.component.api.component.Version;
@@ -20,7 +19,7 @@ import static java.util.Collections.singletonList;
 
 @Version(1)
 @Icon(value = Icon.IconType.CUSTOM, custom = "zendesk_get")
-@PartitionMapper(name = "Get")
+@PartitionMapper(name = "Input")
 @Documentation("Input mapper class")
 public class ZendeskGetMapper implements Serializable {
 
@@ -29,8 +28,7 @@ public class ZendeskGetMapper implements Serializable {
     private final ZendeskHttpClientService zendeskHttpClientService;
 
     public ZendeskGetMapper(@Option("configuration") final ZendeskGetConfiguration configuration,
-            final ZendeskHttpClientService zendeskHttpClientService,
-            final ZendeskAuthHttpClientService zendeskAuthHttpClientService) {
+            final ZendeskHttpClientService zendeskHttpClientService) {
         this.configuration = configuration;
         this.zendeskHttpClientService = zendeskHttpClientService;
         ConfigurationHelper.setupServices();
