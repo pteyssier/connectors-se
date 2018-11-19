@@ -16,20 +16,20 @@ import java.util.stream.Stream;
 
 @Slf4j
 @WithComponents("org.talend.components.zendesk")
-//@ExtendWith(ZendeskTestExtension.class)
+// @ExtendWith(ZendeskTestExtension.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ZendeskServiceTest {
 
     @Service
     private ZendeskService zendeskService;
 
-//    private ZendeskTestExtension.TestContext testContext;
+    // private ZendeskTestExtension.TestContext testContext;
 
-//    @BeforeAll
-//    private void init(ZendeskTestExtension.TestContext testContext) {
-//        log.info("init service test");
-//        this.testContext = testContext;
-//    }
+    // @BeforeAll
+    // private void init(ZendeskTestExtension.TestContext testContext) {
+    // log.info("init service test");
+    // this.testContext = testContext;
+    // }
 
     @ParameterizedTest
     @MethodSource("methodSourceSelectionType")
@@ -39,9 +39,9 @@ public class ZendeskServiceTest {
         ZendeskDataSet dataSet = new ZendeskDataSet();
         dataSet.setSelectionType(selectionType);
 
-//        Schema schema = zendeskService.guessTableSchemaList(dataSet);
-//        Assertions.assertTrue(schema.getEntries().stream().map(Schema.Entry::getName).collect(Collectors.toList())
-//                .containsAll(Arrays.asList("id", "subject", "description")));
+        // Schema schema = zendeskService.guessTableSchemaList(dataSet);
+        // Assertions.assertTrue(schema.getEntries().stream().map(Schema.Entry::getName).collect(Collectors.toList())
+        // .containsAll(Arrays.asList("id", "subject", "description")));
     }
 
     //
