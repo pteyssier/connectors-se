@@ -14,7 +14,7 @@ public class HealthChecker implements Serializable {
     private ZendeskHttpClientService zendeskHttpClientService;
 
     public boolean checkHealth(ZendeskDataStore dataStore) {
-        zendeskHttpClientService.getCurrentUser(dataStore);
-        return true;
+        Long userId = zendeskHttpClientService.getCurrentUser(dataStore).getId();
+        return userId != null;
     }
 }

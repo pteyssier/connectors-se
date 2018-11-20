@@ -78,9 +78,9 @@ class ZendeskTestIT {
 
     @ParameterizedTest
     @MethodSource("methodSourceDataStores")
-    @DisplayName("Output. Write custom ticket")
+    @DisplayName("Output. Update custom ticket")
     void outputComponentUpdate(ZendeskDataStore dataStoreCustom) {
-        log.info("Integration test 'Output. Write custom ticket'. Data store: " + dataStoreCustom);
+        log.info("Integration test 'Output. Update custom ticket'. Data store: " + dataStoreCustom);
 
         JsonObject ticket = getFirstTicket(dataStoreCustom);
         int firstTicketId = ticket.getInt("id");
@@ -105,6 +105,36 @@ class ZendeskTestIT {
 
     @ParameterizedTest
     @MethodSource("methodSourceDataStores")
+    @DisplayName("Output. Update custom ticket (batch)")
+    void outputComponentUpdateBatch(ZendeskDataStore dataStoreCustom) {
+        log.info("Integration test 'Output. Update custom ticket (batch)'. Data store: " + dataStoreCustom);
+
+        JsonObject ticket = getFirstTicket(dataStoreCustom);
+        int firstTicketId = ticket.getInt("id");
+
+        ZendeskPutConfiguration zendeskPutConfiguration = new ZendeskPutConfiguration();
+        zendeskPutConfiguration.setDataSet(ZendeskTestHelper.getTicketDataSet(dataStoreCustom));
+        zendeskPutConfiguration.setUseBatch(true);
+        final String config = SimpleFactory.configurationByExample().forInstance(zendeskPutConfiguration).configured()
+                .toQueryString();
+
+        String newSubject = "Updated subject. " + new Date();
+        JsonObject jsonObject = jsonBuilderFactory.createObjectBuilder().add("id", firstTicketId).add("subject", newSubject)
+                .build();
+        componentsHandler.setInputData(Arrays.asList(jsonObject));
+
+        Job.components().component("emitter", "test://emitter").component("zendesk-output", "Zendesk://Output?" + config)
+                .component("collector", "test://collector").connections().from("emitter").to("zendesk-output")
+                .from("zendesk-output").to("collector").build().run();
+        final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
+        Assertions.assertEquals(1, res.size());
+
+        JsonObject updatedTicket = getTicketById(dataStoreCustom, res.get(0).getInt("id"));
+        Assertions.assertEquals(newSubject, updatedTicket.getString("subject"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("methodSourceDataStores")
     @DisplayName("Output. Write custom ticket")
     void outputComponentCreate(ZendeskDataStore dataStoreCustom) {
         log.info("Integration test 'Output. Write custom ticket'. Data store: " + dataStoreCustom);
@@ -114,6 +144,33 @@ class ZendeskTestIT {
 
         ZendeskPutConfiguration zendeskPutConfiguration = new ZendeskPutConfiguration();
         zendeskPutConfiguration.setDataSet(ZendeskTestHelper.getTicketDataSet(dataStoreCustom));
+        final String config = SimpleFactory.configurationByExample().forInstance(zendeskPutConfiguration).configured()
+                .toQueryString();
+
+        JsonObject jsonObject = jsonBuilderFactory.createObjectBuilder(ticket).remove("id").remove("forum_topic_id").build();
+        componentsHandler.setInputData(Arrays.asList(jsonObject));
+
+        Job.components().component("emitter", "test://emitter").component("zendesk-output", "Zendesk://Output?" + config)
+                .component("collector", "test://collector").connections().from("emitter").to("zendesk-output")
+                .from("zendesk-output").to("collector").build().run();
+        final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
+        Assertions.assertEquals(1, res.size());
+        Assertions.assertNotNull(res.get(0).getInt("id"));
+        Assertions.assertNotEquals(firstTicketId, res.get(0).getInt("id"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("methodSourceDataStores")
+    @DisplayName("Output. Create custom ticket (batch)")
+    void outputComponentCreateBatch(ZendeskDataStore dataStoreCustom) {
+        log.info("Integration test 'Output. Write custom ticket'. Data store: " + dataStoreCustom);
+
+        JsonObject ticket = getFirstTicket(dataStoreCustom);
+        int firstTicketId = ticket.getInt("id");
+
+        ZendeskPutConfiguration zendeskPutConfiguration = new ZendeskPutConfiguration();
+        zendeskPutConfiguration.setDataSet(ZendeskTestHelper.getTicketDataSet(dataStoreCustom));
+        zendeskPutConfiguration.setUseBatch(true);
         final String config = SimpleFactory.configurationByExample().forInstance(zendeskPutConfiguration).configured()
                 .toQueryString();
 

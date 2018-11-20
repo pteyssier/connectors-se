@@ -1,5 +1,6 @@
 package org.talend.components.zendesk.service.http;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.asynchttpclient.ListenableFuture;
 import org.talend.components.zendesk.common.ZendeskDataStore;
@@ -19,6 +20,7 @@ import org.zendesk.client.v2.model.Request;
 import org.zendesk.client.v2.model.Ticket;
 import org.zendesk.client.v2.model.User;
 
+import javax.json.JsonBuilderFactory;
 import javax.json.JsonObject;
 import javax.json.JsonReaderFactory;
 import java.util.ArrayList;
@@ -39,6 +41,9 @@ public class ZendeskHttpClientService {
 
     @Service
     private JsonReaderFactory jsonReaderFactory;
+
+    @Service
+    private JsonBuilderFactory jsonBuilderFactory;
 
     public User getCurrentUser(ZendeskDataStore dataStore) {
         log.debug("get current user");
@@ -172,10 +177,16 @@ public class ZendeskHttpClientService {
         processJobStatus(jobStatus, zendeskServiceClient, success, reject, tickets);
     }
 
-    private void processJobStatus(JobStatus<Ticket> jobStatus, Zendesk zendeskServiceClient, OutputEmitter<JsonObject> success,
+    private void processJobStatus(JobStatus<Ticket> jobStatus_, Zendesk zendeskServiceClient, OutputEmitter<JsonObject> success,
             OutputEmitter<Reject> reject, List<Ticket> tickets) throws InterruptedException {
-        if (jobStatus == null)
+        if (jobStatus_ == null)
             return;
+
+        JobStatus<UpdateResult> jobStatus = new JobStatus<>();
+        jobStatus.setResultsClass(UpdateResult.class);
+        jobStatus.setId(jobStatus_.getId());
+        jobStatus.setUrl(jobStatus_.getUrl());
+        jobStatus.setStatus(jobStatus_.getStatus());
 
         while (jobStatus.getStatus() == JobStatus.JobStatusEnum.queued
                 || jobStatus.getStatus() == JobStatus.JobStatusEnum.working) {
@@ -183,14 +194,26 @@ public class ZendeskHttpClientService {
             jobStatus = zendeskServiceClient.getJobStatus(jobStatus);
         }
         if (jobStatus.getStatus() == JobStatus.JobStatusEnum.completed) {
-            jobStatus.getResults().forEach(ticket -> {
-                log.info("ticket was processed: " + ticket.toString());
-                JsonObject jsonObject = JsonHelper.objectToJsonObject(ticket, jsonReaderFactory);
+            jobStatus.getResults().forEach(updateResult -> {
+                log.info("updateResult was processed: " + updateResult.getId());
+                JsonObject jsonObject = jsonBuilderFactory.createObjectBuilder().add("id", updateResult.getId()).build();
                 success.emit(jsonObject);
             });
         } else {
             throw new RuntimeException("Batch processing failed. " + jobStatus.getMessage() + ". Failed item: "
-                    + tickets.get(jobStatus.getProgress()));
+                    + tickets.get(jobStatus_.getProgress()));
         }
+    }
+
+    @Data
+    public static class UpdateResult {
+
+        Long id;
+
+        String action;
+
+        Boolean success;
+
+        String status;
     }
 }
