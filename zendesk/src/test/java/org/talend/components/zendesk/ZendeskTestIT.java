@@ -49,6 +49,10 @@ class ZendeskTestIT {
 
     private ZendeskTestExtension.TestContext testContext;
 
+    private static final String TEST_DATA_COLLECTOR = "test://collector";
+
+    private static final String TEST_DATA_EMITTER = "test://emitter";
+
     @BeforeAll
     private void init(ZendeskTestExtension.TestContext testContext) {
         log.info("init service test");
@@ -69,7 +73,7 @@ class ZendeskTestIT {
         zendeskGetConfiguration.setQueryString(Integer.toString(firstTicketId));
         final String config = SimpleFactory.configurationByExample().forInstance(zendeskGetConfiguration).configured()
                 .toQueryString();
-        Job.components().component("zendesk-input", "Zendesk://Input?" + config).component("collector", "test://collector")
+        Job.components().component("zendesk-input", "Zendesk://Input?" + config).component("collector", TEST_DATA_COLLECTOR)
                 .connections().from("zendesk-input").to("collector").build().run();
         final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
         Assertions.assertEquals(1, res.size());
@@ -95,8 +99,8 @@ class ZendeskTestIT {
                 .build();
         componentsHandler.setInputData(Arrays.asList(jsonObject));
 
-        Job.components().component("emitter", "test://emitter").component("zendesk-output", "Zendesk://Output?" + config)
-                .component("collector", "test://collector").connections().from("emitter").to("zendesk-output")
+        Job.components().component("emitter", TEST_DATA_EMITTER).component("zendesk-output", "Zendesk://Output?" + config)
+                .component("collector", TEST_DATA_COLLECTOR).connections().from("emitter").to("zendesk-output")
                 .from("zendesk-output").to("collector").build().run();
         final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
         Assertions.assertEquals(1, res.size());
@@ -123,8 +127,8 @@ class ZendeskTestIT {
                 .build();
         componentsHandler.setInputData(Arrays.asList(jsonObject));
 
-        Job.components().component("emitter", "test://emitter").component("zendesk-output", "Zendesk://Output?" + config)
-                .component("collector", "test://collector").connections().from("emitter").to("zendesk-output")
+        Job.components().component("emitter", TEST_DATA_EMITTER).component("zendesk-output", "Zendesk://Output?" + config)
+                .component("collector", TEST_DATA_COLLECTOR).connections().from("emitter").to("zendesk-output")
                 .from("zendesk-output").to("collector").build().run();
         final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
         Assertions.assertEquals(1, res.size());
@@ -150,8 +154,8 @@ class ZendeskTestIT {
         JsonObject jsonObject = jsonBuilderFactory.createObjectBuilder(ticket).remove("id").remove("forum_topic_id").build();
         componentsHandler.setInputData(Arrays.asList(jsonObject));
 
-        Job.components().component("emitter", "test://emitter").component("zendesk-output", "Zendesk://Output?" + config)
-                .component("collector", "test://collector").connections().from("emitter").to("zendesk-output")
+        Job.components().component("emitter", TEST_DATA_EMITTER).component("zendesk-output", "Zendesk://Output?" + config)
+                .component("collector", TEST_DATA_COLLECTOR).connections().from("emitter").to("zendesk-output")
                 .from("zendesk-output").to("collector").build().run();
         final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
         Assertions.assertEquals(1, res.size());
@@ -177,8 +181,8 @@ class ZendeskTestIT {
         JsonObject jsonObject = jsonBuilderFactory.createObjectBuilder(ticket).remove("id").remove("forum_topic_id").build();
         componentsHandler.setInputData(Arrays.asList(jsonObject));
 
-        Job.components().component("emitter", "test://emitter").component("zendesk-output", "Zendesk://Output?" + config)
-                .component("collector", "test://collector").connections().from("emitter").to("zendesk-output")
+        Job.components().component("emitter", TEST_DATA_EMITTER).component("zendesk-output", "Zendesk://Output?" + config)
+                .component("collector", TEST_DATA_COLLECTOR).connections().from("emitter").to("zendesk-output")
                 .from("zendesk-output").to("collector").build().run();
         final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
         Assertions.assertEquals(1, res.size());
@@ -204,8 +208,8 @@ class ZendeskTestIT {
         JsonObject jsonObject = jsonBuilderFactory.createObjectBuilder().add("id", newTicketId).build();
         componentsHandler.setInputData(Arrays.asList(jsonObject));
 
-        Job.components().component("emitter", "test://emitter").component("zendesk-delete", "Zendesk://Delete?" + config)
-                .component("collector", "test://collector").connections().from("emitter").to("zendesk-delete")
+        Job.components().component("emitter", TEST_DATA_EMITTER).component("zendesk-delete", "Zendesk://Delete?" + config)
+                .component("collector", TEST_DATA_COLLECTOR).connections().from("emitter").to("zendesk-delete")
                 .from("zendesk-delete").to("collector").build().run();
 
         JsonObject oldTicket = getTicketById(dataStoreCustom, newTicketId);

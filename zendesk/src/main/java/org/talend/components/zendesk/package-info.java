@@ -1,4 +1,4 @@
-@Components(family = "Zendesk", categories = "Cloud/Zendesk")
+@Components(family = "Zendesk", categories = "Cloud")
 @Icon(value = Icon.IconType.CUSTOM, custom = "zendesk_metadata")
 package org.talend.components.zendesk;
 

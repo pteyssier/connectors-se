@@ -34,6 +34,7 @@ public class JsonHelper {
 
     public static JsonObject objectToJsonObject(Object obj, JsonReaderFactory jsonReaderFactory) {
         try {
+//            ((Ticket) obj).setVia(null);
             String jsonStr = objectMapper.writeValueAsString(obj);
             JsonObject jsonObject = jsonReaderFactory.createReader(new StringReader(jsonStr)).readObject();
             return jsonObject;
