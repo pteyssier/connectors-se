@@ -64,7 +64,7 @@ public class MongoDBInputDataset {
     private List<InputMapping> mapping;
 
     @Option
-    @Documentation("mapping")
+    @Documentation("sort")
     private List<Sort> sort;
 
 }
