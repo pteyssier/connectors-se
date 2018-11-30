@@ -95,6 +95,9 @@ spec:
                      |chmod +x ./connectors-se-docker/src/main/scripts/docker/*.sh
                      |revision=`git rev-parse --abbrev-ref HEAD | tr / _`
                      |./connectors-se-docker/src/main/scripts/docker/all.sh \$revision
+                     |
+                     |# collect doc
+                     |chmod +x .jenkins/generate-doc.sh && .jenkins/generate-doc.sh
                      |""".stripMargin()
                             }
                         }
@@ -104,6 +107,10 @@ spec:
                             publishHTML(target: [
                                     allowMissing: true, alwaysLinkToLastBuild: false, keepAll: true,
                                     reportDir   : 'ci_docker/connectors-se-docker/target', reportFiles: 'docker.html', reportName: "Docker Images"
+                            ])
+                            publishHTML(target: [
+                                    allowMissing: true, alwaysLinkToLastBuild: false, keepAll: true,
+                                    reportDir   : 'ci_docker/target/talend-component-kit_documentation/', reportFiles: 'index.html', reportName: "Component Documentation"
                             ])
                         }
                     }

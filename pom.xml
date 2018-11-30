@@ -562,5 +562,65 @@
         <module>connectors-se-docker</module>
       </modules>
     </profile>
+    <profile>
+      <id>documentation-html</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>3.1.1</version>
+            <executions>
+              <execution>
+                <id>doc-html-theme</id>
+                <phase>none</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.talend.sdk.component</groupId>
+                      <artifactId>component-tools</artifactId>
+                      <version>${component-api.version}</version>
+                      <type>jar</type>
+                      <overWrite>true</overWrite>
+                      <outputDirectory>${maven.multiModuleProjectDirectory}/target/documentation_resources/</outputDirectory>
+                      <includes>resources/html/**/*</includes>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.asciidoctor</groupId>
+            <artifactId>asciidoctor-maven-plugin</artifactId>
+            <version>1.5.7.1</version>
+            <executions>
+              <execution>
+                <id>html</id>
+                <phase>none</phase>
+                <goals>
+                  <goal>process-asciidoc</goal>
+                </goals>
+                <configuration>
+                  <sourceDirectory>${project.build.outputDirectory}/TALEND-INF</sourceDirectory>
+                  <sourceDocumentName>documentation.adoc</sourceDocumentName>
+                  <outputDirectory>${maven.multiModuleProjectDirectory}/target/talend-component-kit_documentation/${project.artifactId}/</outputDirectory>
+                  <backend>html5</backend>
+                  <attributes>
+                    <stylesdir>${maven.multiModuleProjectDirectory}/target/documentation_resources/resources/html</stylesdir>
+                    <stylesheet>talend.css</stylesheet>
+                    <data-uri />
+                    <toc />
+                  </attributes>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 </project>
