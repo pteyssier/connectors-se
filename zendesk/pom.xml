@@ -83,7 +83,6 @@
             <argLine>${surefireArgLine}</argLine>
             <forkCount></forkCount>
             <reuseForks></reuseForks>
-            <trimStackTrace></trimStackTrace>
           </configuration>
           <dependencies>
             <dependency>
@@ -254,13 +253,6 @@
         <configuration>
           <systemPropertyVariables>
             <talend.component.junit.handler.state>static</talend.component.junit.handler.state>
-            <!--<talend.beam.job.enforceImmutability>false</talend.beam.job.enforceImmutability>-->
-            <!--<talend.beam.job.enforceEncodability>false</talend.beam.job.enforceEncodability>-->
-            <!--
-               You can activate the targetParallelism to control the parallelism of the test pipeline.
-               You can also set it to 1 to debug more easily
-            -->
-            <!--<talend.beam.job.targetParallelism>1</talend.beam.job.targetParallelism>-->
           </systemPropertyVariables>
         </configuration>
         <executions>
@@ -285,9 +277,6 @@
               <goal>integration-test</goal>
               <goal>verify</goal>
             </goals>
-            <configuration>
-              <testFailureIgnore>true</testFailureIgnore>
-            </configuration>
           </execution>
         </executions>
       </plugin>
