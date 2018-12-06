@@ -36,7 +36,7 @@ public class MongoDBInputEmitter implements Serializable {
 
     private final MongoDBService service;
 
-    private final MongoDBInputDataset inputDataset;
+    private final MongoDBInputConfig inputDataset;
 
     private MongoCollection<Document> collection;
 
@@ -46,15 +46,15 @@ public class MongoDBInputEmitter implements Serializable {
 
     // final private Messages i18n;
 
-    public MongoDBInputEmitter(@Option("configuration") final MongoDBInputDataset inputDataset, final MongoDBService service) {
+    public MongoDBInputEmitter(@Option("configuration") final MongoDBInputConfig inputDataset, final MongoDBService service) {
         this.service = service;
         this.inputDataset = inputDataset;
-        this.fields = inputDataset.getSchema();
+        this.fields = inputDataset.getDataset().getSchema();
     }
 
     @PostConstruct
     public void init() {
-        mongo = service.getConnection(inputDataset.getDataStore());
+        mongo = service.getConnection(inputDataset.getDataset().getDataStore());
         collection = service.getCollection(inputDataset);
 
         // ListIndexesIterable<DBObject> indexListIterable = collection.listIndexes(DBObject.class);

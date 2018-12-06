@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.talend.components.mongodb.datastore.MongoDBDataStore;
-import org.talend.components.mongodb.input.MongoDBInputDataset;
+import org.talend.components.mongodb.input.MongoDBInputConfig;
 import org.talend.components.mongodb.service.MongoDBService;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.api.service.healthcheck.HealthCheckStatus;
@@ -57,12 +57,12 @@ public class MongoDBServiceTestIT {
 
     @Test
     public void getCollection() {
-        MongoDBInputDataset dataset = new MongoDBInputDataset();
-        dataset.setDataStore(datastore);
-        dataset.setCollection("personalstakesTEST651_12");
-        dataset.setQuery("{}");
+        MongoDBInputConfig config = new MongoDBInputConfig();
+        config.getDataset().setDataStore(datastore);
+        config.getDataset().setCollection("personalstakesTEST651_12");
+        config.setQuery("{}");
         service.testConnection(datastore, i18n);
-        MongoCollection<Document> collection = service.getCollection(dataset);
+        MongoCollection<Document> collection = service.getCollection(config.getDataset());
         Assert.assertNotNull(collection);
 
     }

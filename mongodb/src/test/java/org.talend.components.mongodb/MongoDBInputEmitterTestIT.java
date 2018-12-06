@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.talend.components.mongodb.datastore.MongoDBDataStore;
-import org.talend.components.mongodb.input.MongoDBInputDataset;
+import org.talend.components.mongodb.input.MongoDBInputConfig;
 import org.talend.components.mongodb.input.MongoDBInputEmitter;
 import org.talend.components.mongodb.service.MongoDBService;
 import org.talend.sdk.component.api.service.Service;
@@ -13,7 +13,7 @@ import org.talend.sdk.component.api.service.Service;
 @Disabled("Need connect to MongoDB")
 public class MongoDBInputEmitterTestIT {
 
-    MongoDBInputDataset dataset;
+    MongoDBInputConfig dataset;
 
     MongoDBInputEmitter emitter;
 
@@ -26,10 +26,10 @@ public class MongoDBInputEmitterTestIT {
         datastore.setServer("localhost");
         datastore.setPort("27017");
         datastore.setDatabase("testdb");
-        dataset = new MongoDBInputDataset();
-        dataset.setDataStore(datastore);
+        dataset = new MongoDBInputConfig();
+        dataset.getDataset().setDataStore(datastore);
         dataset.setQuery("{}");
-        dataset.setCollection("personalstakesTEST651_12");
+        dataset.getDataset().setCollection("personalstakesTEST651_12");
         service = new MongoDBService();
         emitter = new MongoDBInputEmitter(dataset, service);
     }

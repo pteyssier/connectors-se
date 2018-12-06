@@ -7,7 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.talend.components.mongodb.Messages;
 import org.talend.components.mongodb.datastore.MongoDBDataStore;
-import org.talend.components.mongodb.input.MongoDBInputDataset;
+import org.talend.components.mongodb.datastore.MongoDBDataset;
+import org.talend.components.mongodb.input.MongoDBInputConfig;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.api.service.healthcheck.HealthCheck;
 import org.talend.sdk.component.api.service.healthcheck.HealthCheckStatus;
@@ -65,12 +66,12 @@ public class MongoDBService {
         // TODO useReplicaSet
 
         mongo.addOption(Bytes.QUERYOPTION_NOTIMEOUT);
-        // log.info("Connecting to " + mongo.getServerAddressList() + ".");
+         log.info("Connecting to " + mongo.getServerAddressList() + ".");
 
         return mongo;
     }
 
-    public MongoCollection<Document> getCollection(final MongoDBInputDataset dataset) {
+    public MongoCollection<Document> getCollection(final MongoDBDataset dataset) {
         MongoDatabase db = mongo.getDatabase(dataset.getDataStore().getDatabase());
         log.debug("Retrieving records from the datasource.");
         return db.getCollection(dataset.getCollection());
