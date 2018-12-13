@@ -7,12 +7,13 @@ import org.talend.sdk.component.api.component.Icon;
 import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.processor.*;
+import org.talend.sdk.component.api.record.Record;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.json.JsonObject;
 
-@Processor
+@Processor(name = "output")
 @Version(1)
 @Slf4j
 @Icon(value = Icon.IconType.CUSTOM, custom = "MongoDBOutput")
@@ -28,9 +29,9 @@ public class MongoDBOutputProcessor {
     }
 
     @ElementListener
-    public JsonObject map(@Input final JsonObject data) {
-        return null;
-    }
+//    public void elementListener(@Input final Record record) {
+//        records.add(record);
+//    }
 
     @PostConstruct
     public void init() {

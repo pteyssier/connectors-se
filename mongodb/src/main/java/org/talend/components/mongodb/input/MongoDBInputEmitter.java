@@ -36,7 +36,7 @@ public class MongoDBInputEmitter implements Serializable {
 
     private final MongoDBService service;
 
-    private final MongoDBInputConfig inputDataset;
+    private final MongoDBInputConfig inputConfig;
 
     private MongoCollection<Document> collection;
 
@@ -44,18 +44,20 @@ public class MongoDBInputEmitter implements Serializable {
 
     private List<String> fields;
 
+    MongoCursor<Document> cursor;
+
     // final private Messages i18n;
 
-    public MongoDBInputEmitter(@Option("configuration") final MongoDBInputConfig inputDataset, final MongoDBService service) {
+    public MongoDBInputEmitter(@Option("configuration") final MongoDBInputConfig inputConfig, final MongoDBService service) {
         this.service = service;
-        this.inputDataset = inputDataset;
-        this.fields = inputDataset.getDataset().getSchema();
+        this.inputConfig = inputConfig;
+        this.fields = inputConfig.getDataset().getSchema();
     }
 
     @PostConstruct
     public void init() {
-        mongo = service.getConnection(inputDataset.getDataset().getDataStore());
-        collection = service.getCollection(inputDataset);
+        mongo = service.getConnection(inputConfig.getDataset().getDataStore());
+        collection = service.getCollection(inputConfig.getDataset());
 
         // ListIndexesIterable<DBObject> indexListIterable = collection.listIndexes(DBObject.class);
         boolean needIndexWarning = true;
@@ -66,7 +68,7 @@ public class MongoDBInputEmitter implements Serializable {
                 // - contain the db DBcolumnName between two backslashed quotes
                 // - is followed at some point by a colon
                 // - there is no comma between the the DBcolumnName and the colon
-                if ((inputDataset.getQuery()).matches(".*" + key + "[^,]*:.*")) {
+                if ((inputConfig.getQuery()).matches(".*" + key + "[^,]*:.*")) {
                     // We have an index, do not print error message
                     needIndexWarning = false;
                 } else {
@@ -81,17 +83,17 @@ public class MongoDBInputEmitter implements Serializable {
             log.warn("tMongoDBInput_1 - The query does not contain any reference an index.  [" + indexList.substring(1) + " ]");
 
         }
+        Document myQuery = Document.parse(inputConfig.getQuery());
+        FindIterable<Document> fi = collection.find(myQuery).noCursorTimeout(false);
+        // Map<String, String> pathMap = new HashMap<String, String>();
+        // fi = fi.limit(inputConfig.getLimite());
+        cursor = fi.iterator();
 
     }
 
     @Producer
     public IndexedRecord next() {
 
-        Document myQuery = Document.parse(inputDataset.getQuery());
-        FindIterable<Document> fi = collection.find(myQuery).noCursorTimeout(false);
-        // Map<String, String> pathMap = new HashMap<String, String>();
-        // fi = fi.limit(inputDataset.getLimite());
-        MongoCursor<Document> cursor = fi.iterator();
         if (cursor.hasNext()) {
             Document document = cursor.next();
             return new MongoDBRecord(document, fields);
