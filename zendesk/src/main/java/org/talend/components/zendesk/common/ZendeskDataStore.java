@@ -48,12 +48,4 @@ public class ZendeskDataStore implements Serializable {
     @ActiveIf(target = "authenticationType", value = { "API_TOKEN" })
     private AuthenticationApiTokenConfiguration authenticationApiTokenConfiguration;
 
-    public AuthenticationConfiguration getAuthSettings() throws UnknownAuthenticationTypeException {
-        if (authenticationType == AuthenticationType.LOGIN_PASSWORD) {
-            return authenticationLoginPasswordConfiguration;
-        } else if (authenticationType == AuthenticationType.API_TOKEN) {
-            return authenticationApiTokenConfiguration;
-        }
-        throw new UnknownAuthenticationTypeException();
-    }
 }
