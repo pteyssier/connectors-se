@@ -8,8 +8,8 @@ import lombok.ToString;
 import org.talend.components.zendesk.helpers.ConfigurationHelper;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.action.Checkable;
-import org.talend.sdk.component.api.configuration.action.Validable;
 import org.talend.sdk.component.api.configuration.condition.ActiveIf;
+import org.talend.sdk.component.api.configuration.constraint.Pattern;
 import org.talend.sdk.component.api.configuration.type.DataStore;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.meta.Documentation;
@@ -31,7 +31,7 @@ public class ZendeskDataStore implements Serializable {
 
     @Option
     @Documentation("Zendesk server URL")
-    @Validable("validateServerUrl")
+    @Pattern("^(http://|https://).*")
     private String serverUrl = "";
 
     @Option

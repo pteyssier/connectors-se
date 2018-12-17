@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.talend.sdk.component.api.configuration.Option;
-import org.talend.sdk.component.api.configuration.action.Validable;
+import org.talend.sdk.component.api.configuration.constraint.Pattern;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.meta.Documentation;
 
@@ -21,12 +21,12 @@ public class AuthenticationApiTokenConfiguration implements Serializable, Authen
 
     @Option
     @Documentation("Authentication login")
-    @Validable("validateAuthenticationLogin")
+    @Pattern("^\\S+")
     private String authenticationLogin = "";
 
     @Option
     @Documentation("Api token")
-    @Validable("validateApiToken")
+    @Pattern("^\\S+")
     private String apiToken = "";
 
 }

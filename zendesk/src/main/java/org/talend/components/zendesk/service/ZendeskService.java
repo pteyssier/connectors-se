@@ -11,8 +11,6 @@ import org.talend.components.zendesk.sources.get.ZendeskGetConfiguration;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.api.service.Service;
-import org.talend.sdk.component.api.service.asyncvalidation.AsyncValidation;
-import org.talend.sdk.component.api.service.asyncvalidation.ValidationResult;
 import org.talend.sdk.component.api.service.healthcheck.HealthCheck;
 import org.talend.sdk.component.api.service.healthcheck.HealthCheckStatus;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
@@ -60,29 +58,5 @@ public class ZendeskService {
             return new HealthCheckStatus(HealthCheckStatus.Status.KO, i18n.healthCheckFailed(e.getMessage()));
         }
         return new HealthCheckStatus(HealthCheckStatus.Status.OK, i18n.healthCheckOk());
-    }
-
-    @AsyncValidation("validateServerUrl")
-    public ValidationResult validateServerUrl(String serverUrl) {
-        if (serverUrl.isEmpty()) {
-            return new ValidationResult(ValidationResult.Status.KO, i18n.healthCheckServerUrlIsEmpty());
-        }
-        return new ValidationResult(ValidationResult.Status.OK, "");
-    }
-
-    @AsyncValidation("validateAuthenticationLogin")
-    public ValidationResult validateAuthenticationLogin(String authenticationLogin) {
-        if (authenticationLogin.isEmpty()) {
-            return new ValidationResult(ValidationResult.Status.KO, i18n.healthCheckLoginIsEmpty());
-        }
-        return new ValidationResult(ValidationResult.Status.OK, "");
-    }
-
-    @AsyncValidation("validateApiToken")
-    public ValidationResult validateApiToken(String apiToken) {
-        if (apiToken.isEmpty()) {
-            return new ValidationResult(ValidationResult.Status.KO, i18n.healthCheckLoginIsEmpty());
-        }
-        return new ValidationResult(ValidationResult.Status.OK, "");
     }
 }
