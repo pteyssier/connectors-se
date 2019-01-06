@@ -70,10 +70,9 @@ public class ZendeskDeleteSource implements Serializable {
         if (!batchData.isEmpty()) {
             switch (configuration.getDataSet().getSelectionType()) {
             case TICKETS:
-                zendeskHttpClientService.deleteTickets(configuration,
-                        batchData.stream().map(jsonObject -> JsonHelper.jsonObjectToObjectInstance(jsonObject, Ticket.class))
-                                .collect(Collectors.toList()),
-                        success, reject);
+                zendeskHttpClientService.deleteTickets(configuration, batchData.stream()
+                        .map(jsonObject -> JsonHelper.toInstance(jsonObject, Ticket.class)).collect(Collectors.toList()), success,
+                        reject);
                 break;
             }
         }

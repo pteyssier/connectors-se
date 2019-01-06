@@ -9,10 +9,8 @@ public interface Messages {
 
     String healthCheckFailed(String error);
 
-    String healthCheckLoginIsEmpty();
-
-    String healthCheckServerUrlIsEmpty();
-
     String deleteUnsupportedType();
+
+    String UnknownTypeException();
 
 }

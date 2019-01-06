@@ -9,9 +9,6 @@ public class ConfigurationHelper {
     public static final String DATA_STORE_ID = "ZendeskDataStore";
 
     public static final String DATA_SET_ID = "ZendeskDataSet";
-    // public static final String DATA_SET_GET_ID = "ZendeskDataSetGet";
-    //
-    // public static final String DATA_SET_PUT_ID = "ZendeskDataSetPut";
 
     public static final String DATA_STORE_HEALTH_CHECK = "DataStoreHealthCheck";
 

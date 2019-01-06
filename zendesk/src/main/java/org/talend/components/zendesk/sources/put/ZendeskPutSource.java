@@ -5,6 +5,7 @@ import org.talend.components.zendesk.common.SelectionType;
 import org.talend.components.zendesk.helpers.CommonHelper;
 import org.talend.components.zendesk.helpers.ConfigurationHelper;
 import org.talend.components.zendesk.helpers.JsonHelper;
+import org.talend.components.zendesk.messages.Messages;
 import org.talend.components.zendesk.service.http.ZendeskHttpClientService;
 import org.talend.components.zendesk.sources.Reject;
 import org.talend.sdk.component.api.component.Icon;
@@ -41,10 +42,13 @@ public class ZendeskPutSource implements Serializable {
 
     private List<JsonObject> batchData = new ArrayList<>();
 
+    private Messages i18n;
+
     public ZendeskPutSource(@Option("configuration") final ZendeskPutConfiguration configuration,
-            final ZendeskHttpClientService zendeskHttpClientService) {
+            final ZendeskHttpClientService zendeskHttpClientService, final Messages i18n) {
         this.configuration = configuration;
         this.zendeskHttpClientService = zendeskHttpClientService;
+        this.i18n = i18n;
         ConfigurationHelper.setupServices();
     }
 
@@ -70,15 +74,15 @@ public class ZendeskPutSource implements Serializable {
             JsonObject newRecord;
             switch (configuration.getDataSet().getSelectionType()) {
             case REQUESTS:
-                Request item = JsonHelper.jsonObjectToObjectInstance(record, Request.class);
+                Request item = JsonHelper.toInstance(record, Request.class);
                 newRecord = zendeskHttpClientService.putRequest(configuration.getDataSet().getDataStore(), item);
                 break;
             case TICKETS:
-                Ticket ticket = JsonHelper.jsonObjectToObjectInstance(record, Ticket.class);
+                Ticket ticket = JsonHelper.toInstance(record, Ticket.class);
                 newRecord = zendeskHttpClientService.putTicket(configuration.getDataSet().getDataStore(), ticket);
                 break;
             default:
-                throw new UnsupportedOperationException();
+                throw new RuntimeException(i18n.UnknownTypeException());
             }
             checkNullResult(newRecord);
             success.emit(newRecord);
@@ -99,9 +103,9 @@ public class ZendeskPutSource implements Serializable {
         if (!batchData.isEmpty()) {
             switch (configuration.getDataSet().getSelectionType()) {
             case TICKETS:
-                zendeskHttpClientService.putTickets(configuration.getDataSet().getDataStore(),
-                        batchData.stream().map(jsonObject -> JsonHelper.jsonObjectToObjectInstance(jsonObject, Ticket.class))
-                                .collect(Collectors.toList()),
+                zendeskHttpClientService.putTickets(
+                        configuration.getDataSet().getDataStore(), batchData.stream()
+                                .map(jsonObject -> JsonHelper.toInstance(jsonObject, Ticket.class)).collect(Collectors.toList()),
                         success, reject);
                 break;
             }

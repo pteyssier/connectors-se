@@ -29,6 +29,6 @@ public class InputIterator implements Iterator<JsonObject> {
             return null;
         }
         Object obj = dataListIterator.next();
-        return JsonHelper.objectToJsonObject(obj, jsonReaderFactory);
+        return JsonHelper.toJsonObject(obj, jsonReaderFactory);
     }
 }

@@ -1,6 +1,7 @@
-package org.talend.components.zendesk.common;
+package org.talend.components.zendesk.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.talend.components.zendesk.common.ZendeskDataStore;
 import org.talend.components.zendesk.service.http.ZendeskHttpClientService;
 import org.talend.sdk.component.api.service.Service;
 

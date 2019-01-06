@@ -245,7 +245,7 @@ class ZendeskTestIT {
 
     private JsonObject createTicketDirectly(ZendeskDataStore dataStore) {
         JsonObject ticketJson = getFirstTicket(dataStore);
-        Ticket ticket = JsonHelper.jsonObjectToObjectInstance(ticketJson, Ticket.class);
+        Ticket ticket = JsonHelper.toInstance(ticketJson, Ticket.class);
         ticket.setId(null);
         ticket.setForumTopicId(null);
 

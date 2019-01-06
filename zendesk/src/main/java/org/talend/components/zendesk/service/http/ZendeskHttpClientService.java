@@ -63,7 +63,7 @@ public class ZendeskHttpClientService {
         log.debug("put requests");
         Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore).getZendeskServiceClient();
         Request newItem = zendeskServiceClient.createRequest(request);
-        return JsonHelper.objectToJsonObject(newItem, jsonReaderFactory);
+        return JsonHelper.toJsonObject(newItem, jsonReaderFactory);
     }
 
     public InputIterator getTickets(ZendeskGetConfiguration configuration) {
@@ -75,12 +75,7 @@ public class ZendeskHttpClientService {
             data = zendeskServiceClient.getTickets();
         } else {
             // the result is available on Zendesk server after indexing
-            // try {
             data = zendeskServiceClient.getSearchResults(Ticket.class, configuration.getQueryString());
-            // URLEncoder.encode(configuration.getQueryString(), StringHelper.STRING_CHARSET));
-            // } catch (UnsupportedEncodingException e) {
-            // throw new RuntimeException(e);
-            // }
         }
         return new InputIterator(data.iterator(), jsonReaderFactory);
     }
@@ -94,7 +89,7 @@ public class ZendeskHttpClientService {
         } else {
             newItem = zendeskServiceClient.updateTicket(ticket);
         }
-        return JsonHelper.objectToJsonObject(newItem, jsonReaderFactory);
+        return JsonHelper.toJsonObject(newItem, jsonReaderFactory);
     }
 
     public void putTickets(ZendeskDataStore dataStore, List<Ticket> tickets, OutputEmitter<JsonObject> success,
@@ -151,18 +146,12 @@ public class ZendeskHttpClientService {
         Long firstId = tickets.get(0).getId();
         Long[] idArray = tickets.stream().map(Request::getId).toArray(Long[]::new);
         try {
-            // if (permanently) {
-            // JobStatus jobStatus = zendeskServiceClient.permanentlyDeleteTickets(firstId,
-            // CommonHelper.arrayOfObjectsToPrimitives(idArray));
-            // processJobStatus(jobStatus, zendeskServiceClient, success, reject, tickets);
-            // } else {
-            zendeskServiceClient.deleteTickets(firstId, CommonHelper.arrayOfObjectsToPrimitives(idArray));
+            zendeskServiceClient.deleteTickets(firstId, CommonHelper.toPrimitives(idArray));
             tickets.forEach(ticket -> {
                 log.info("ticket was processed: " + ticket.toString());
-                JsonObject jsonObject = JsonHelper.objectToJsonObject(ticket, jsonReaderFactory);
+                JsonObject jsonObject = JsonHelper.toJsonObject(ticket, jsonReaderFactory);
                 success.emit(jsonObject);
             });
-            // }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

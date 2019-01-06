@@ -1,10 +1,11 @@
-package org.talend.components.zendesk.common;
+package org.talend.components.zendesk.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.talend.components.zendesk.helpers.CommonHelper;
+import org.talend.components.zendesk.messages.Messages;
 import org.talend.components.zendesk.service.http.ZendeskHttpClientService;
 import org.talend.components.zendesk.sources.get.InputIterator;
 import org.talend.components.zendesk.sources.get.ZendeskGetConfiguration;
-import org.talend.sdk.component.api.meta.Documentation;
 import org.talend.sdk.component.api.service.Service;
 
 import javax.json.JsonValue;
@@ -13,9 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Documentation("Schema discovering class")
 @Service
 public class SchemaDiscoverer implements Serializable {
+
+    @Service
+    private Messages i18n;
 
     @Service
     private ZendeskHttpClientService httpClientService;
@@ -23,15 +26,8 @@ public class SchemaDiscoverer implements Serializable {
     public List<String> getColumns(ZendeskGetConfiguration configuration) {
         List<String> result = new ArrayList<>();
         try {
-            InputIterator itemIterator = null;
-            switch (configuration.getDataSet().getSelectionType()) {
-            case REQUESTS:
-                itemIterator = httpClientService.getRequests(configuration.getDataSet().getDataStore());
-                break;
-            case TICKETS:
-                itemIterator = httpClientService.getTickets(configuration);
-                break;
-            }
+            InputIterator itemIterator = CommonHelper.getInputIterator(httpClientService, configuration, i18n);
+
             if (itemIterator.hasNext()) {
                 JsonValue val = itemIterator.next();
                 val.asJsonObject().forEach((columnName, value) -> result.add(columnName));

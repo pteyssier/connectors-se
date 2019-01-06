@@ -1,8 +1,6 @@
 package org.talend.components.zendesk.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.talend.components.zendesk.common.HealthChecker;
-import org.talend.components.zendesk.common.SchemaDiscoverer;
 import org.talend.components.zendesk.common.ZendeskDataSet;
 import org.talend.components.zendesk.common.ZendeskDataStore;
 import org.talend.components.zendesk.helpers.ConfigurationHelper;
