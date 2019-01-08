@@ -33,7 +33,9 @@ import static java.lang.Thread.sleep;
 @Slf4j
 public class ZendeskHttpClientService {
 
-    // max allowed size for 'create items' batch in Zendesk API (see documentation)
+    /**
+     * max allowed size for 'create items' batch in Zendesk API (see documentation)
+     */
     private final int MAX_ALLOWED_BATCH_SIZE = 100;
 
     @Service
@@ -109,7 +111,11 @@ public class ZendeskHttpClientService {
         List<Ticket> ticketsUpdate = new ArrayList<>();
         List<Ticket> ticketsCreate = new ArrayList<>();
         tickets.forEach(ticket -> {
-            boolean add = ticket.getId() != null ? ticketsUpdate.add(ticket) : ticketsCreate.add(ticket);
+            if (ticket.getId() != null) {
+                ticketsUpdate.add(ticket);
+            } else {
+                ticketsCreate.add(ticket);
+            }
         });
 
         ListenableFuture<JobStatus<Ticket>> updateFuture = ticketsUpdate.isEmpty() ? null
@@ -166,16 +172,16 @@ public class ZendeskHttpClientService {
         processJobStatus(jobStatus, zendeskServiceClient, success, reject, tickets);
     }
 
-    private void processJobStatus(JobStatus<Ticket> jobStatus_, Zendesk zendeskServiceClient, OutputEmitter<JsonObject> success,
-            OutputEmitter<Reject> reject, List<Ticket> tickets) throws InterruptedException {
-        if (jobStatus_ == null)
+    private void processJobStatus(JobStatus<Ticket> ticketJobStatus, Zendesk zendeskServiceClient,
+            OutputEmitter<JsonObject> success, OutputEmitter<Reject> reject, List<Ticket> tickets) throws InterruptedException {
+        if (ticketJobStatus == null)
             return;
 
         JobStatus<UpdateResult> jobStatus = new JobStatus<>();
         jobStatus.setResultsClass(UpdateResult.class);
-        jobStatus.setId(jobStatus_.getId());
-        jobStatus.setUrl(jobStatus_.getUrl());
-        jobStatus.setStatus(jobStatus_.getStatus());
+        jobStatus.setId(ticketJobStatus.getId());
+        jobStatus.setUrl(ticketJobStatus.getUrl());
+        jobStatus.setStatus(ticketJobStatus.getStatus());
 
         while (jobStatus.getStatus() == JobStatus.JobStatusEnum.queued
                 || jobStatus.getStatus() == JobStatus.JobStatusEnum.working) {
@@ -190,7 +196,7 @@ public class ZendeskHttpClientService {
             });
         } else {
             throw new RuntimeException("Batch processing failed. " + jobStatus.getMessage() + ". Failed item: "
-                    + tickets.get(jobStatus_.getProgress()));
+                    + tickets.get(ticketJobStatus.getProgress()));
         }
     }
 

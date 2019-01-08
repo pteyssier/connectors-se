@@ -16,8 +16,6 @@ public class InputIterator implements Iterator<JsonObject> {
 
     private final JsonReaderFactory jsonReaderFactory;
 
-    // private final JsonBuilderFactory jsonBuilderFactory;
-
     @Override
     public boolean hasNext() {
         return dataListIterator.hasNext();

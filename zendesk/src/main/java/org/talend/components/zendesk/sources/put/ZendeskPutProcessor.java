@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Icon(value = Icon.IconType.CUSTOM, custom = "zendesk_put")
 @Processor(name = "Output")
 @Documentation("Data put processor")
-public class ZendeskPutSource implements Serializable {
+public class ZendeskPutProcessor implements Serializable {
 
     private final ZendeskPutConfiguration configuration;
 
@@ -42,12 +42,14 @@ public class ZendeskPutSource implements Serializable {
     private List<JsonObject> batchData = new ArrayList<>();
 
     private Messages i18n;
+    private boolean useBatch;
 
-    public ZendeskPutSource(@Option("configuration") final ZendeskPutConfiguration configuration,
-            final ZendeskHttpClientService zendeskHttpClientService, final Messages i18n) {
+    public ZendeskPutProcessor(@Option("configuration") final ZendeskPutConfiguration configuration,
+                               final ZendeskHttpClientService zendeskHttpClientService, final Messages i18n) {
         this.configuration = configuration;
         this.zendeskHttpClientService = zendeskHttpClientService;
         this.i18n = i18n;
+        useBatch = configuration.isUseBatch() && configuration.getDataSet().getSelectionType() == SelectionType.TICKETS;
     }
 
     @BeforeGroup
@@ -58,8 +60,7 @@ public class ZendeskPutSource implements Serializable {
     @ElementListener
     public void onNext(@Input final JsonObject record, final @Output OutputEmitter<JsonObject> success,
             final @Output("reject") OutputEmitter<Reject> reject) throws IOException {
-        boolean useBatch = configuration.isUseBatch();
-        if (useBatch && configuration.getDataSet().getSelectionType() == SelectionType.TICKETS) {
+        if (useBatch) {
             batchData.add(record);
         } else {
             processOutputElement(record, success, reject);

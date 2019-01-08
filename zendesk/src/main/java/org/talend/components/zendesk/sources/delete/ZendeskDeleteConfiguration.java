@@ -17,9 +17,4 @@ public class ZendeskDeleteConfiguration implements Serializable {
     @Documentation("Connection to server")
     private ZendeskDataSet dataSet;
 
-    // @Option
-    // @ActiveIf(target = "dataSet/selectionType", value = { "TICKETS" })
-    // @Documentation("Permanently delete tickets.")
-    // private boolean permanently;
-
 }

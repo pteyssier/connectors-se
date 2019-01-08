@@ -14,8 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@GridLayout({ @GridLayout.Row({ "dataSet" }), @GridLayout.Row({ "queryString" }) })
-@GridLayout(names = GridLayout.FormType.ADVANCED, value = { @GridLayout.Row({ "fields" }) })
+@GridLayout({ @GridLayout.Row({ "dataSet" }), @GridLayout.Row({ "queryString" }), @GridLayout.Row({ "fields" }) })
 @Documentation("'Input component' configuration")
 public class ZendeskGetConfiguration implements Serializable {
 

@@ -19,6 +19,7 @@ import org.talend.sdk.component.api.processor.OutputEmitter;
 import org.talend.sdk.component.api.processor.Processor;
 import org.zendesk.client.v2.model.Ticket;
 
+import javax.annotation.PostConstruct;
 import javax.json.JsonObject;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 @Icon(value = Icon.IconType.CUSTOM, custom = "zendesk_delete")
 @Processor(name = "Delete")
 @Documentation("Data delete processor")
-public class ZendeskDeleteSource implements Serializable {
+public class ZendeskDeleteProcessor implements Serializable {
 
     private final ZendeskDeleteConfiguration configuration;
 
@@ -40,11 +41,18 @@ public class ZendeskDeleteSource implements Serializable {
 
     private Messages i18n;
 
-    public ZendeskDeleteSource(@Option("configuration") final ZendeskDeleteConfiguration configuration,
+    public ZendeskDeleteProcessor(@Option("configuration") final ZendeskDeleteConfiguration configuration,
             final ZendeskHttpClientService zendeskHttpClientService, final Messages i18n) {
         this.configuration = configuration;
         this.zendeskHttpClientService = zendeskHttpClientService;
         this.i18n = i18n;
+    }
+
+    @PostConstruct
+    public void init() {
+        if (configuration.getDataSet().getSelectionType() != SelectionType.TICKETS) {
+            throw new UnsupportedOperationException(i18n.deleteUnsupportedType());
+        }
     }
 
     @BeforeGroup
@@ -55,10 +63,10 @@ public class ZendeskDeleteSource implements Serializable {
     @ElementListener
     public void onNext(@Input final JsonObject record, final @Output OutputEmitter<JsonObject> success,
             final @Output("reject") OutputEmitter<Reject> reject) {
-        if (configuration.getDataSet().getSelectionType() == SelectionType.TICKETS) {
+        switch (configuration.getDataSet().getSelectionType()) {
+        case TICKETS:
             batchData.add(record);
-        } else {
-            throw new UnsupportedOperationException(i18n.deleteUnsupportedType());
+            break;
         }
     }
 

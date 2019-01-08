@@ -69,14 +69,11 @@ class ZendeskServiceTestIT {
         ZendeskDataSet dataSet = new ZendeskDataSet();
         dataSet.setSelectionType(selectionType);
 
-        // ZendeskGetConfiguration configuration = new ZendeskGetConfiguration();
-        // configuration.setDataSet(dataSet);
         dataSet.setDataStore(testContext.getDataStoreLoginPassword());
 
         Schema schema = zendeskService.guessTableSchema(dataSet);
         Assertions.assertTrue(schema.getEntries().stream().map(item -> item.getName()).collect(Collectors.toList())
                 .containsAll(Arrays.asList("id", "subject", "description")));
-
     }
 
     private Stream<Arguments> methodSourceSelectionType() {
