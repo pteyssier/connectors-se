@@ -14,7 +14,4 @@ public class ConfigurationHelper {
 
     public static final String DISCOVER_SCHEMA_LIST_ID = "DiscoverSchemaList";
 
-    public static void setupServices() {
-    }
-
 }

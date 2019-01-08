@@ -1,12 +1,15 @@
 package org.talend.components.zendesk.sources.get;
 
-import org.talend.components.zendesk.helpers.ConfigurationHelper;
 import org.talend.components.zendesk.messages.Messages;
 import org.talend.components.zendesk.service.http.ZendeskHttpClientService;
 import org.talend.sdk.component.api.component.Icon;
 import org.talend.sdk.component.api.component.Version;
 import org.talend.sdk.component.api.configuration.Option;
-import org.talend.sdk.component.api.input.*;
+import org.talend.sdk.component.api.input.Assessor;
+import org.talend.sdk.component.api.input.Emitter;
+import org.talend.sdk.component.api.input.PartitionMapper;
+import org.talend.sdk.component.api.input.PartitionSize;
+import org.talend.sdk.component.api.input.Split;
 import org.talend.sdk.component.api.meta.Documentation;
 
 import java.io.Serializable;
@@ -31,7 +34,6 @@ public class ZendeskGetMapper implements Serializable {
         this.configuration = configuration;
         this.zendeskHttpClientService = zendeskHttpClientService;
         this.i18n = i18n;
-        ConfigurationHelper.setupServices();
     }
 
     @Assessor

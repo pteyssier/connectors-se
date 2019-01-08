@@ -50,7 +50,6 @@ public class ZendeskService {
     public HealthCheckStatus validateBasicConnection(@Option final ZendeskDataStore dataStore) {
         try {
             log.debug("health check");
-            ConfigurationHelper.setupServices();
             healthChecker.checkHealth(dataStore);
         } catch (Exception e) {
             return new HealthCheckStatus(HealthCheckStatus.Status.KO, i18n.healthCheckFailed(e.getMessage()));

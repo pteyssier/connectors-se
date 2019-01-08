@@ -2,7 +2,6 @@ package org.talend.components.zendesk.sources.delete;
 
 import lombok.extern.slf4j.Slf4j;
 import org.talend.components.zendesk.common.SelectionType;
-import org.talend.components.zendesk.helpers.ConfigurationHelper;
 import org.talend.components.zendesk.helpers.JsonHelper;
 import org.talend.components.zendesk.messages.Messages;
 import org.talend.components.zendesk.service.http.ZendeskHttpClientService;
@@ -46,7 +45,6 @@ public class ZendeskDeleteSource implements Serializable {
         this.configuration = configuration;
         this.zendeskHttpClientService = zendeskHttpClientService;
         this.i18n = i18n;
-        ConfigurationHelper.setupServices();
     }
 
     @BeforeGroup

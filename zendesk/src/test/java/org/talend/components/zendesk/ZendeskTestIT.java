@@ -211,7 +211,12 @@ class ZendeskTestIT {
         Job.components().component("emitter", TEST_DATA_EMITTER).component("zendesk-delete", "Zendesk://Delete?" + config)
                 .component("collector", TEST_DATA_COLLECTOR).connections().from("emitter").to("zendesk-delete")
                 .from("zendesk-delete").to("collector").build().run();
-
+        // wait a little bit (the deleted ticket can be seen via id some period of time after deleting)
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         JsonObject oldTicket = getTicketById(dataStoreCustom, newTicketId);
         Assertions.assertNull(oldTicket);
     }
