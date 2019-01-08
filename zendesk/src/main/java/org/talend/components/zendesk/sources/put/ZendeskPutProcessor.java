@@ -42,10 +42,11 @@ public class ZendeskPutProcessor implements Serializable {
     private List<JsonObject> batchData = new ArrayList<>();
 
     private Messages i18n;
+
     private boolean useBatch;
 
     public ZendeskPutProcessor(@Option("configuration") final ZendeskPutConfiguration configuration,
-                               final ZendeskHttpClientService zendeskHttpClientService, final Messages i18n) {
+            final ZendeskHttpClientService zendeskHttpClientService, final Messages i18n) {
         this.configuration = configuration;
         this.zendeskHttpClientService = zendeskHttpClientService;
         this.i18n = i18n;
