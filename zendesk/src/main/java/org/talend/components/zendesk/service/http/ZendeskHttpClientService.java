@@ -49,29 +49,28 @@ public class ZendeskHttpClientService {
 
     public User getCurrentUser(ZendeskDataStore dataStore) {
         log.debug("get current user");
-        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore).getZendeskServiceClient();
+        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore);
         User user = zendeskServiceClient.getCurrentUser();
         return user;
     }
 
     public InputIterator getRequests(ZendeskDataStore dataStore) {
         log.debug("get requests");
-        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore).getZendeskServiceClient();
+        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore);
         Iterable<Request> data = zendeskServiceClient.getRequests();
         return new InputIterator(data.iterator(), jsonReaderFactory);
     }
 
     public JsonObject putRequest(ZendeskDataStore dataStore, Request request) {
         log.debug("put requests");
-        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore).getZendeskServiceClient();
+        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore);
         Request newItem = zendeskServiceClient.createRequest(request);
         return JsonHelper.toJsonObject(newItem, jsonReaderFactory);
     }
 
     public InputIterator getTickets(ZendeskGetConfiguration configuration) {
         log.debug("get tickets");
-        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(configuration.getDataSet().getDataStore())
-                .getZendeskServiceClient();
+        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(configuration.getDataSet().getDataStore());
         Iterable<Ticket> data;
         if (configuration.isQueryStringEmpty()) {
             data = zendeskServiceClient.getTickets();
@@ -84,7 +83,7 @@ public class ZendeskHttpClientService {
 
     public JsonObject putTicket(ZendeskDataStore dataStore, Ticket ticket) {
         log.debug("put ticket");
-        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore).getZendeskServiceClient();
+        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore);
         Ticket newItem;
         if (ticket.getId() == null) {
             newItem = zendeskServiceClient.createTicket(ticket);
@@ -97,7 +96,7 @@ public class ZendeskHttpClientService {
     public void putTickets(ZendeskDataStore dataStore, List<Ticket> tickets, OutputEmitter<JsonObject> success,
             OutputEmitter<Reject> reject) {
         log.debug("put tickets");
-        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore).getZendeskServiceClient();
+        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(dataStore);
 
         PagedList<Ticket> pagedList = new PagedList<>(tickets, MAX_ALLOWED_BATCH_SIZE);
         List<Ticket> listPage;
@@ -134,8 +133,7 @@ public class ZendeskHttpClientService {
     public void deleteTickets(ZendeskDeleteConfiguration configuration, List<Ticket> tickets, OutputEmitter<JsonObject> success,
             OutputEmitter<Reject> reject) {
         log.debug("delete tickets");
-        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(configuration.getDataSet().getDataStore())
-                .getZendeskServiceClient();
+        Zendesk zendeskServiceClient = zendeskClientService.getZendeskClientWrapper(configuration.getDataSet().getDataStore());
         PagedList<Ticket> pagedList = new PagedList<>(tickets, MAX_ALLOWED_BATCH_SIZE);
         List<Ticket> listPage;
         while ((listPage = pagedList.getNextPage()) != null) {
