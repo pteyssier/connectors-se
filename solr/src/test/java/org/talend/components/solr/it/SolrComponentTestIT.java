@@ -9,8 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.talend.components.solr.common.FilterCriteria;
-import org.talend.components.solr.common.SolrDataset;
 import org.talend.components.solr.common.SolrDataStore;
+import org.talend.components.solr.common.SolrDataset;
 import org.talend.components.solr.output.SolrAction;
 import org.talend.components.solr.output.SolrProcessorOutputConfiguration;
 import org.talend.components.solr.service.Messages;
@@ -18,11 +18,11 @@ import org.talend.components.solr.service.SolrConnectorService;
 import org.talend.components.solr.service.SolrConnectorUtils;
 import org.talend.components.solr.service.TestMessages;
 import org.talend.components.solr.source.SolrInputMapperConfiguration;
+import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.api.service.completion.SuggestionValues;
 import org.talend.sdk.component.api.service.healthcheck.HealthCheckStatus;
-import org.talend.sdk.component.api.service.schema.Schema;
-import org.talend.sdk.component.api.service.schema.Type;
+import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
 import org.talend.sdk.component.junit.BaseComponentsHandler;
 import org.talend.sdk.component.junit5.Injected;
 import org.talend.sdk.component.junit5.WithComponents;
@@ -30,15 +30,15 @@ import org.talend.sdk.component.runtime.manager.chain.Job;
 
 import javax.json.JsonBuilderFactory;
 import javax.json.JsonObject;
-
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.talend.sdk.component.junit.SimpleFactory.configurationByExample;
 
 @WithComponents("org.talend.components.solr")
@@ -63,6 +63,12 @@ public class SolrComponentTestIT {
 
     @Service
     private JsonBuilderFactory factory;
+
+    @Service
+    private RecordBuilderFactory recordBuilderFactory;
+
+    @Service
+    private SolrConnectorService solrConnectorService;
 
     private SolrInputMapperConfiguration inputMapperConfiguration;
 
@@ -154,19 +160,23 @@ public class SolrComponentTestIT {
     @Test
     @DisplayName("Guess schema")
     void guessTableSchemaTest() {
-        SolrConnectorService service = new SolrConnectorService();
+        // SolrConnectorService service = new SolrConnectorService();
         SolrInputMapperConfiguration config = new SolrInputMapperConfiguration();
         SolrConnectorUtils util = new SolrConnectorUtils();
         config.setDataset(solrConnection);
-        // Schema schema = service.guessTableSchema(config.getDataset(), util);
-        // Schema expectedSchema = new Schema(Arrays.asList(new Schema.Entry("id", Type.STRING)));
-        // assertEquals(expectedSchema, schema);
+        Schema schema = solrConnectorService.guessTableSchema(config.getDataset(), util);
+
+        Schema.Builder schemaBuilder = recordBuilderFactory.newSchemaBuilder(Schema.Type.RECORD);
+        schemaBuilder.withEntry(recordBuilderFactory.newEntryBuilder().withName("id").withType(Schema.Type.STRING).build());
+        Schema expectedSchema = schemaBuilder.build();
+
+        assertEquals(expectedSchema, schema);
     }
 
     @Test
     @DisplayName("Guess schema failed test")
     void guessSchemaFailedTest() {
-        SolrConnectorService service = new SolrConnectorService();
+        // SolrConnectorService service = new SolrConnectorService();
         SolrInputMapperConfiguration config = new SolrInputMapperConfiguration();
         SolrConnectorUtils util = new SolrConnectorUtils();
         SolrDataset connection = new SolrDataset();
@@ -177,40 +187,40 @@ public class SolrComponentTestIT {
         dataStore.setPassword(PASSWORD);
         connection.setDataStore(dataStore);
         config.setDataset(connection);
-        // Schema schema = service.guessTableSchema(config.getDataset(), util);
-        // assertEquals(new Schema(Collections.emptyList()), schema);
+        Schema schema = solrConnectorService.guessTableSchema(config.getDataset(), util);
+        assertTrue(schema.getEntries().isEmpty());
     }
 
     @Test
     @DisplayName("Check Connection")
     void checkConnectionTest() {
-        SolrConnectorService service = new SolrConnectorService();
+        // SolrConnectorService service = new SolrConnectorService();
         SolrConnectorUtils util = new SolrConnectorUtils();
         SolrDataStore dataStore = new SolrDataStore();
         dataStore.setUrl(SOLR_URL);
         dataStore.setLogin(LOGIN);
         dataStore.setPassword(PASSWORD);
-        HealthCheckStatus status = service.checkConnection(dataStore, messages, util);
+        HealthCheckStatus status = solrConnectorService.checkConnection(dataStore, messages, util);
         assertEquals("OK", status.getStatus().name());
     }
 
     @Test
     @DisplayName("Check Failed Connection")
     void checkConnectionNegativeTest() {
-        SolrConnectorService service = new SolrConnectorService();
+        // SolrConnectorService service = new SolrConnectorService();
         SolrConnectorUtils util = new SolrConnectorUtils();
         SolrDataStore dataStore = new SolrDataStore();
         dataStore.setUrl("http://localhost:8982/badsolrurl");
         dataStore.setLogin(LOGIN);
         dataStore.setPassword(PASSWORD);
-        HealthCheckStatus status = service.checkConnection(dataStore, messages, util);
+        HealthCheckStatus status = solrConnectorService.checkConnection(dataStore, messages, util);
         assertEquals("KO", status.getStatus().name());
     }
 
     @Test
     @DisplayName("Check suggestCore")
     void suggestTest() {
-        SolrConnectorService service = new SolrConnectorService();
+        // SolrConnectorService service = new SolrConnectorService();
         SolrInputMapperConfiguration config = new SolrInputMapperConfiguration();
         SolrConnectorUtils util = new SolrConnectorUtils();
         config.setDataset(solrConnection);
@@ -218,14 +228,14 @@ public class SolrComponentTestIT {
         dataStore.setUrl(SOLR_URL);
         dataStore.setPassword(PASSWORD);
         dataStore.setLogin(LOGIN);
-        SuggestionValues values = service.suggestCore(dataStore, util);
+        SuggestionValues values = solrConnectorService.suggestCore(dataStore, util);
         assertEquals(Arrays.asList(new SuggestionValues.Item(CORE, CORE)), values.getItems());
     }
 
     @Test
     @DisplayName("Check suggestCore")
     void testSuggestRawQuery() {
-        SolrConnectorService service = new SolrConnectorService();
+        // SolrConnectorService service = new SolrConnectorService();
         SolrInputMapperConfiguration config = new SolrInputMapperConfiguration();
         config.setDataset(solrConnection);
         FilterCriteria criteriaId = new FilterCriteria();
@@ -237,7 +247,7 @@ public class SolrComponentTestIT {
         config.setFilterQuery(Arrays.asList(criteriaId, criteriaComp));
         config.setRows("1");
         config.setStart("1");
-        SuggestionValues values = service.suggestRawQuery(config, new SolrConnectorUtils());
+        SuggestionValues values = solrConnectorService.suggestRawQuery(config, new SolrConnectorUtils());
         SuggestionValues expected = new SuggestionValues();
         SuggestionValues.Item item = new SuggestionValues.Item();
         item.setId("q=*:*&fq=id:apple&fq=compName_s:Apple&rows=1&start=1");

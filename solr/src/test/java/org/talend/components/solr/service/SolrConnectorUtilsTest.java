@@ -11,19 +11,36 @@ import org.talend.components.solr.common.FilterCriteria;
 import org.talend.components.solr.output.SolrActionExecutorFactory;
 import org.talend.components.solr.output.UnsupportedSolrActionException;
 import org.talend.components.solr.source.SolrInputMapperConfiguration;
-import org.talend.sdk.component.api.service.schema.Schema;
-import org.talend.sdk.component.api.service.schema.Type;
+import org.talend.sdk.component.api.record.Schema;
+import org.talend.sdk.component.api.service.Service;
+import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
+import org.talend.sdk.component.junit5.WithComponents;
 
 import javax.json.Json;
 import javax.json.JsonObject;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
-import java.io.*;
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 @Slf4j
+@WithComponents("org.talend.components.solr")
 public class SolrConnectorUtilsTest {
+
+    @Service
+    private RecordBuilderFactory recordBuilderFactory;
 
     private SolrConnectorUtils util;
 
@@ -100,14 +117,14 @@ public class SolrConnectorUtilsTest {
 
     @Test
     public void testGetSchemaFromRepresentationNullRepresentation() {
-        assertEquals(new Schema(Collections.emptyList()), util.getSchemaFromRepresentation(null, null));
+        assertTrue(util.getSchemaFromRepresentation(null, recordBuilderFactory).getEntries().isEmpty());
     }
 
     @Test
     public void testGetSchemaFromRepresentationEmpty() {
         SchemaRepresentation representation = new SchemaRepresentation();
         representation.setFields(Arrays.asList(new HashMap<>()));
-        assertEquals(new Schema(Collections.emptyList()), util.getSchemaFromRepresentation(representation, null));
+        assertTrue(util.getSchemaFromRepresentation(representation, recordBuilderFactory).getEntries().isEmpty());
     }
 
     @Test
@@ -124,19 +141,25 @@ public class SolrConnectorUtilsTest {
         Gson gson = new GsonBuilder().create();
         SchemaRepresentation representation = gson.fromJson(reader, SchemaRepresentation.class);
 
-        // List<Schema.Entry> entries = new ArrayList<>();
-        // entries.add(new Schema.Entry("_src_", Type.STRING));
-        // entries.add(new Schema.Entry("author", Type.STRING));
-        // entries.add(new Schema.Entry("cat", Type.STRING));
-        // entries.add(new Schema.Entry("category", Type.STRING));
-        // entries.add(new Schema.Entry("comments", Type.STRING));
-        // entries.add(new Schema.Entry("content", Type.STRING));
-        // entries.add(new Schema.Entry("inStock", Type.BOOLEAN));
-        // entries.add(new Schema.Entry("popularity", Type.INT));
-        // entries.add(new Schema.Entry("price", Type.DOUBLE));
-        // Schema expected = new Schema(entries);
+        Map<String, Schema.Type> schemaTypes = new TreeMap<>();
+        schemaTypes.put("_src_", Schema.Type.STRING);
+        schemaTypes.put("author", Schema.Type.STRING);
+        schemaTypes.put("cat", Schema.Type.STRING);
+        schemaTypes.put("category", Schema.Type.STRING);
+        schemaTypes.put("comments", Schema.Type.STRING);
+        schemaTypes.put("content", Schema.Type.STRING);
+        schemaTypes.put("inStock", Schema.Type.BOOLEAN);
+        schemaTypes.put("popularity", Schema.Type.INT);
+        schemaTypes.put("price", Schema.Type.DOUBLE);
 
-        assertEquals(null, util.getSchemaFromRepresentation(representation, null));
+        Schema.Builder schemaBuilder = recordBuilderFactory
+                .newSchemaBuilder(org.talend.sdk.component.api.record.Schema.Type.RECORD);
+        schemaTypes.forEach((key, value) -> {
+            schemaBuilder.withEntry(recordBuilderFactory.newEntryBuilder().withName(key).withType(value).build());
+        });
+        Schema expected = schemaBuilder.build();
+
+        assertEquals(expected, util.getSchemaFromRepresentation(representation, recordBuilderFactory));
     }
 
     @Test

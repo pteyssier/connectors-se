@@ -1,17 +1,5 @@
 package org.talend.components.solr.source;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-import javax.json.JsonBuilderFactory;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -24,6 +12,17 @@ import org.talend.components.solr.service.SolrConnectorUtils;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.input.Producer;
 import org.talend.sdk.component.api.meta.Documentation;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.json.JsonBuilderFactory;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 @Slf4j
 @Documentation("Solr input source. Provides to receive data from Solr data collections")

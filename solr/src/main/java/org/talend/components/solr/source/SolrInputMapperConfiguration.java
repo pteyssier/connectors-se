@@ -1,9 +1,6 @@
 package org.talend.components.solr.source;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
+import lombok.Data;
 import org.talend.components.solr.common.FilterCriteria;
 import org.talend.components.solr.common.SolrDataset;
 import org.talend.sdk.component.api.configuration.Option;
@@ -11,7 +8,10 @@ import org.talend.sdk.component.api.configuration.action.Suggestable;
 import org.talend.sdk.component.api.configuration.constraint.Pattern;
 import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.meta.Documentation;
-import lombok.Data;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @GridLayout({ @GridLayout.Row({ "dataset" }), @GridLayout.Row({ "filterQuery" }), @GridLayout.Row({ "start" }),

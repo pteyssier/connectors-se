@@ -11,10 +11,15 @@ import org.talend.components.solr.source.SolrInputMapperConfiguration;
 import org.talend.sdk.component.api.record.Schema;
 import org.talend.sdk.component.api.service.Service;
 import org.talend.sdk.component.api.service.record.RecordBuilderFactory;
-import org.talend.sdk.component.api.service.schema.Type;
 
 import javax.json.JsonObject;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -118,21 +123,22 @@ public class SolrConnectorUtils {
         return value;
     }
 
-    public org.talend.sdk.component.api.record.Schema getSchemaFromRepresentation(SchemaRepresentation representation,
-            final RecordBuilderFactory factory) {
-        // if (representation == null) {
-        // return new Schema(Collections.emptyList());
-        // }
-        // List<Map<String, Object>> fields = representation.getFields();
-        // List<Schema.Entry> entries = new ArrayList<>();
-        // for (Map<String, Object> field : fields) {
-        // String fieldName = getFieldName(field);
-        // if (fieldName != null && checkStored(field)) {
-        // entries.add(new Schema.Entry(fieldName, getFieldType(field)));
-        // }
-        // }
-        // return new Schema(entries);
-        return factory.newSchemaBuilder(Schema.Type.LONG).build();
+    public Schema getSchemaFromRepresentation(SchemaRepresentation representation,
+            final RecordBuilderFactory recordBuilderFactory) {
+        Schema.Builder schemaBuilder = recordBuilderFactory.newSchemaBuilder(Schema.Type.RECORD);
+        if (representation == null) {
+            return schemaBuilder.build();
+        }
+        List<Map<String, Object>> fields = representation.getFields();
+        for (Map<String, Object> field : fields) {
+            String fieldName = getFieldName(field);
+            if (fieldName != null && checkStored(field)) {
+                Schema.Entry schemaEntry = recordBuilderFactory.newEntryBuilder().withName(fieldName)
+                        .withType(getFieldType(field)).build();
+                schemaBuilder.withEntry(schemaEntry);
+            }
+        }
+        return schemaBuilder.build();
     }
 
     private boolean checkStored(Map<String, Object> field) {
@@ -148,16 +154,16 @@ public class SolrConnectorUtils {
         return name.toString();
     }
 
-    private Type getFieldType(Map<String, Object> field) {
+    private Schema.Type getFieldType(Map<String, Object> field) {
         Object type = field.get(SOLR_FIELD_PROPERTY_TYPE);
         if (SOLR_FIELD_PROPERTY_TYPES_INT.contains(type)) {
-            return Type.INT;
+            return Schema.Type.INT;
         } else if (SOLR_FIELD_PROPERTY_TYPES_BOOL.contains(type)) {
-            return Type.BOOLEAN;
+            return Schema.Type.BOOLEAN;
         } else if (SOLR_FIELD_PROPERTY_TYPES_DOUBLE.contains(type)) {
-            return Type.DOUBLE;
+            return Schema.Type.DOUBLE;
         } else {
-            return Type.STRING;
+            return Schema.Type.STRING;
         }
     }
 

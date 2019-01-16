@@ -33,14 +33,14 @@ import java.util.stream.Collectors;
 public class SolrConnectorService {
 
     @Service
-    private RecordBuilderFactory factory;
+    private RecordBuilderFactory recordBuilderFactory;
 
     @DiscoverSchema("discoverSchema")
     public Schema guessTableSchema(SolrDataset dataset, SolrConnectorUtils util) {
         HttpSolrClient solrClient = new HttpSolrClient.Builder(dataset.getFullUrl()).build();
         SchemaRepresentation representation = getSchemaRepresentation(solrClient, dataset.getDataStore().getLogin(),
                 dataset.getDataStore().getPassword(), util);
-        return util.getSchemaFromRepresentation(representation, factory);
+        return util.getSchemaFromRepresentation(representation, recordBuilderFactory);
     }
 
     private SchemaRepresentation getSchemaRepresentation(SolrClient solrClient, String login, String pass,
