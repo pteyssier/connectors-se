@@ -19,3 +19,4 @@ ENV SOLR_SSL_ENABLED=true \
   SOLR_SSL_KEY_STORE_TYPE=JKS \
   SOLR_SSL_TRUST_STORE_TYPE=JKS
 
+HEALTHCHECK --interval=5s CMD curl --fail http://localhost:8983/ || exit 1

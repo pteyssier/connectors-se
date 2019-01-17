@@ -1,9 +1,15 @@
 package org.talend.components.solr.common;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.talend.sdk.component.junit5.WithComponents;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Slf4j
+@WithComponents("org.talend.components.solr")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SolrDatasetTest {
 
     @Test

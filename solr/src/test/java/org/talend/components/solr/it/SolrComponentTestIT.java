@@ -1,13 +1,17 @@
 package org.talend.components.solr.it;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.QueryRequest;
 import org.apache.solr.common.SolrDocument;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.talend.components.solr.SolrTestExtension;
 import org.talend.components.solr.common.FilterCriteria;
 import org.talend.components.solr.common.SolrDataStore;
 import org.talend.components.solr.common.SolrDataset;
@@ -41,22 +45,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.talend.sdk.component.junit.SimpleFactory.configurationByExample;
 
+@Slf4j
 @WithComponents("org.talend.components.solr")
+@ExtendWith(SolrTestExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class SolrComponentTestIT {
-
-    private final static String DOCKER_HOST_ADDRESS = System.getProperty("dockerHostAddress", "localhost");
-
-    private final static String SOLR_PORT = System.getProperty("solr.test.port", "8983");
-
-    private final static String SOLR_URL = "https://" + DOCKER_HOST_ADDRESS + ":" + SOLR_PORT + "/solr/";
-
-    private final static String CORE = "testcore";
-
-    private final static String LOGIN = "solr";
-
-    private final static String PASSWORD = "SolrRocks";
-
-    private final static Messages messages = new TestMessages();
 
     @Injected
     private BaseComponentsHandler componentsHandler;
@@ -64,36 +57,37 @@ public class SolrComponentTestIT {
     @Service
     private JsonBuilderFactory factory;
 
+    private final static Messages messages = new TestMessages();
+
     @Service
     private RecordBuilderFactory recordBuilderFactory;
 
     @Service
     private SolrConnectorService solrConnectorService;
 
-    private SolrInputMapperConfiguration inputMapperConfiguration;
+    private SolrTestExtension.TestContext testContext;
 
-    private SolrProcessorOutputConfiguration solrProcessorOutputConfiguration;
+    @BeforeAll
+    private void init(SolrTestExtension.TestContext testContext) {
+        this.testContext = testContext;
+    }
 
-    private SolrDataset solrConnection;
+    private SolrInputMapperConfiguration createInputMapperConfiguration() {
+        SolrInputMapperConfiguration inputMapperConfiguration = new SolrInputMapperConfiguration();
+        inputMapperConfiguration.setDataset(testContext.getSolrConnection());
+        return inputMapperConfiguration;
+    }
 
-    @BeforeEach
-    public void init() {
-        final SolrDataStore dataStore = new SolrDataStore();
-        dataStore.setUrl(SOLR_URL);
-        dataStore.setLogin(LOGIN);
-        dataStore.setPassword(PASSWORD);
-        solrConnection = new SolrDataset();
-        solrConnection.setCore(CORE);
-        solrConnection.setDataStore(dataStore);
-        inputMapperConfiguration = new SolrInputMapperConfiguration();
-        inputMapperConfiguration.setDataset(solrConnection);
-        solrProcessorOutputConfiguration = new SolrProcessorOutputConfiguration();
-        solrProcessorOutputConfiguration.setDataset(solrConnection);
+    private SolrProcessorOutputConfiguration createSolrProcessorOutputConfiguration() {
+        SolrProcessorOutputConfiguration solrProcessorOutputConfiguration = new SolrProcessorOutputConfiguration();
+        solrProcessorOutputConfiguration.setDataset(testContext.getSolrConnection());
+        return solrProcessorOutputConfiguration;
     }
 
     @Test
     @DisplayName("Solr")
     void inputTest() {
+        SolrInputMapperConfiguration inputMapperConfiguration = createInputMapperConfiguration();
         inputMapperConfiguration.setRows("100");
         final String config = configurationByExample().forInstance(inputMapperConfiguration).configured().toQueryString();
         Job.components().component("SolrInput", "Solr://Input?" + config).component("collector", "test://collector").connections()
@@ -107,6 +101,7 @@ public class SolrComponentTestIT {
     @Test
     @DisplayName("Solr")
     void inputRawTest() {
+        SolrInputMapperConfiguration inputMapperConfiguration = createInputMapperConfiguration();
         inputMapperConfiguration.setRows("100");
         inputMapperConfiguration.setRawQuery("q=id:adata");
         final String config = configurationByExample().forInstance(inputMapperConfiguration).configured().toQueryString();
@@ -122,6 +117,7 @@ public class SolrComponentTestIT {
     @Test
     @DisplayName("UpdateTest")
     void outputUpdateTest() throws IOException, SolrServerException {
+        SolrProcessorOutputConfiguration solrProcessorOutputConfiguration = createSolrProcessorOutputConfiguration();
         solrProcessorOutputConfiguration.setAction(SolrAction.UPSERT);
         final String config = configurationByExample().forInstance(solrProcessorOutputConfiguration).configured().toQueryString();
 
@@ -141,6 +137,7 @@ public class SolrComponentTestIT {
     @Test
     @DisplayName("Solr")
     void outputDeleteTest() throws IOException, SolrServerException {
+        SolrProcessorOutputConfiguration solrProcessorOutputConfiguration = createSolrProcessorOutputConfiguration();
         solrProcessorOutputConfiguration.setAction(SolrAction.DELETE);
         final String config = configurationByExample().forInstance(solrProcessorOutputConfiguration).configured().toQueryString();
         componentsHandler.setInputData(asList(factory.createObjectBuilder().add("id", "apple").build(),
@@ -157,13 +154,23 @@ public class SolrComponentTestIT {
                 .containsAll(Arrays.asList("viewsonic", "ati", "belkin")));
     }
 
+    private List<SolrDocument> getFirs100Documents() throws IOException, SolrServerException {
+        HttpSolrClient solrClient = new HttpSolrClient.Builder(
+                testContext.getSolrConnection().getDataStore().getUrl() + SolrTestExtension.CORE).build();
+        SolrQuery query = new SolrQuery("*:*");
+        query.setRows(100);
+        QueryRequest req = new QueryRequest(query);
+        req.setBasicAuthCredentials(SolrTestExtension.LOGIN, SolrTestExtension.PASSWORD);
+        return req.process(solrClient).getResults();
+    }
+
     @Test
     @DisplayName("Guess schema")
     void guessTableSchemaTest() {
         // SolrConnectorService service = new SolrConnectorService();
         SolrInputMapperConfiguration config = new SolrInputMapperConfiguration();
         SolrConnectorUtils util = new SolrConnectorUtils();
-        config.setDataset(solrConnection);
+        config.setDataset(testContext.getSolrConnection());
         Schema schema = solrConnectorService.guessTableSchema(config.getDataset(), util);
 
         Schema.Builder schemaBuilder = recordBuilderFactory.newSchemaBuilder(Schema.Type.RECORD);
@@ -180,11 +187,11 @@ public class SolrComponentTestIT {
         SolrInputMapperConfiguration config = new SolrInputMapperConfiguration();
         SolrConnectorUtils util = new SolrConnectorUtils();
         SolrDataset connection = new SolrDataset();
-        connection.setCore(CORE);
+        connection.setCore(SolrTestExtension.CORE);
         SolrDataStore dataStore = new SolrDataStore();
         dataStore.setUrl("https://localhost:8983/badsolrurl");
-        dataStore.setLogin(LOGIN);
-        dataStore.setPassword(PASSWORD);
+        dataStore.setLogin(SolrTestExtension.LOGIN);
+        dataStore.setPassword(SolrTestExtension.PASSWORD);
         connection.setDataStore(dataStore);
         config.setDataset(connection);
         Schema schema = solrConnectorService.guessTableSchema(config.getDataset(), util);
@@ -197,9 +204,9 @@ public class SolrComponentTestIT {
         // SolrConnectorService service = new SolrConnectorService();
         SolrConnectorUtils util = new SolrConnectorUtils();
         SolrDataStore dataStore = new SolrDataStore();
-        dataStore.setUrl(SOLR_URL);
-        dataStore.setLogin(LOGIN);
-        dataStore.setPassword(PASSWORD);
+        dataStore.setUrl(testContext.getSolrConnection().getDataStore().getUrl());
+        dataStore.setLogin(SolrTestExtension.LOGIN);
+        dataStore.setPassword(SolrTestExtension.PASSWORD);
         HealthCheckStatus status = solrConnectorService.checkConnection(dataStore, messages, util);
         assertEquals("OK", status.getStatus().name());
     }
@@ -211,8 +218,8 @@ public class SolrComponentTestIT {
         SolrConnectorUtils util = new SolrConnectorUtils();
         SolrDataStore dataStore = new SolrDataStore();
         dataStore.setUrl("http://localhost:8982/badsolrurl");
-        dataStore.setLogin(LOGIN);
-        dataStore.setPassword(PASSWORD);
+        dataStore.setLogin(SolrTestExtension.LOGIN);
+        dataStore.setPassword(SolrTestExtension.PASSWORD);
         HealthCheckStatus status = solrConnectorService.checkConnection(dataStore, messages, util);
         assertEquals("KO", status.getStatus().name());
     }
@@ -223,21 +230,20 @@ public class SolrComponentTestIT {
         // SolrConnectorService service = new SolrConnectorService();
         SolrInputMapperConfiguration config = new SolrInputMapperConfiguration();
         SolrConnectorUtils util = new SolrConnectorUtils();
-        config.setDataset(solrConnection);
+        config.setDataset(testContext.getSolrConnection());
         SolrDataStore dataStore = new SolrDataStore();
-        dataStore.setUrl(SOLR_URL);
-        dataStore.setPassword(PASSWORD);
-        dataStore.setLogin(LOGIN);
+        dataStore.setUrl(testContext.getSolrConnection().getDataStore().getUrl());
+        dataStore.setPassword(SolrTestExtension.PASSWORD);
+        dataStore.setLogin(SolrTestExtension.LOGIN);
         SuggestionValues values = solrConnectorService.suggestCore(dataStore, util);
-        assertEquals(Arrays.asList(new SuggestionValues.Item(CORE, CORE)), values.getItems());
+        assertEquals(Arrays.asList(new SuggestionValues.Item(SolrTestExtension.CORE, SolrTestExtension.CORE)), values.getItems());
     }
 
     @Test
     @DisplayName("Check suggestCore")
     void testSuggestRawQuery() {
-        // SolrConnectorService service = new SolrConnectorService();
         SolrInputMapperConfiguration config = new SolrInputMapperConfiguration();
-        config.setDataset(solrConnection);
+        config.setDataset(testContext.getSolrConnection());
         FilterCriteria criteriaId = new FilterCriteria();
         criteriaId.setField("id");
         criteriaId.setValue("apple");
@@ -254,15 +260,6 @@ public class SolrComponentTestIT {
         item.setLabel("q=*:*&fq=id:apple&fq=compName_s:Apple&rows=1&start=1");
         expected.setItems(Arrays.asList(item));
         assertEquals(expected, values);
-    }
-
-    private List<SolrDocument> getFirs100Documents() throws IOException, SolrServerException {
-        HttpSolrClient solrClient = new HttpSolrClient.Builder(SOLR_URL + CORE).build();
-        SolrQuery query = new SolrQuery("*:*");
-        query.setRows(100);
-        QueryRequest req = new QueryRequest(query);
-        req.setBasicAuthCredentials(LOGIN, PASSWORD);
-        return req.process(solrClient).getResults();
     }
 
 }
