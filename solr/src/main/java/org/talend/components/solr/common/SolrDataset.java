@@ -9,6 +9,7 @@ import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.configuration.ui.widget.Structure;
 import org.talend.sdk.component.api.meta.Documentation;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -17,7 +18,7 @@ import java.util.List;
 @Documentation("Solr dataSet. Provide connection to Solr Data Collection")
 @GridLayout(value = { @GridLayout.Row({ "schema" }) }, names = { GridLayout.FormType.ADVANCED })
 
-public class SolrDataset {
+public class SolrDataset implements Serializable {
 
     @Option
     @Documentation("Solr dataStore. Connection for Solr server")

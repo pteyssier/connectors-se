@@ -10,12 +10,14 @@ import org.talend.sdk.component.api.configuration.ui.layout.GridLayout;
 import org.talend.sdk.component.api.configuration.ui.widget.Credential;
 import org.talend.sdk.component.api.meta.Documentation;
 
+import java.io.Serializable;
+
 @Data
 @DataStore("SolrDataStore")
 @Checkable("checkSolrConnection")
 @Documentation("A connection to Solr server")
 @GridLayout({ @GridLayout.Row({ "url" }), @GridLayout.Row({ "login" }), @GridLayout.Row({ "password" }) })
-public class SolrDataStore {
+public class SolrDataStore implements Serializable {
 
     @Option
     @Required
