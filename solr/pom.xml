@@ -13,19 +13,12 @@
   <name>Components :: Solr</name>
 
   <properties>
-    <component-api.version>1.1.1</component-api.version>
-    <component-runtime.version>1.1.3-SNAPSHOT</component-runtime.version>
-    <!-- overrides parent pom property to fix dataset validation issue -->
-    <validation.model>false</validation.model>
     <solr-ssl.trust-key-store.path>
       ${project.basedir}/src/test/resources/solr-ssl-dockerfile/solr-ssl.keystore.jks
     </solr-ssl.trust-key-store.path>
     <dockerFile.directory>
       ${project.basedir}/src/test/resources/solr-ssl-dockerfile
     </dockerFile.directory>
-    <!--<docker-image.name>skhylko/solr:1.0.0</docker-image.name>-->
-    <!--<surefire.version>2.22.0</surefire.version>-->
-    <!--<failsafe.version>2.22.0</failsafe.version>-->
     <testcontainers.version>1.10.3</testcontainers.version>
     <junit-platform-surefire-provider.version>1.2.0</junit-platform-surefire-provider.version>
   </properties>
@@ -80,9 +73,6 @@
           <version>${surefire.version}</version>
           <configuration>
             <argLine>${surefireArgLine}</argLine>
-            <!--<forkCount></forkCount>-->
-            <!--<reuseForks></reuseForks>-->
-            <!--<useSystemClassLoader>false</useSystemClassLoader>-->
           </configuration>
           <dependencies>
             <dependency>
@@ -109,8 +99,6 @@
           <version>${surefire.version}</version>
           <configuration>
             <argLine>${failSafeArgLine}</argLine>
-            <!--<forkCount></forkCount>-->
-            <!--<reuseForks></reuseForks>-->
           </configuration>
           <dependencies>
             <dependency>
@@ -157,9 +145,6 @@
             <goals>
               <goal>test</goal>
             </goals>
-            <!--<configuration>-->
-              <!--<testFailureIgnore>true</testFailureIgnore>-->
-            <!--</configuration>-->
           </execution>
         </executions>
       </plugin>
@@ -168,15 +153,11 @@
         <artifactId>maven-failsafe-plugin</artifactId>
         <configuration>
           <systemPropertyVariables>
+            <solr.test.port>8983</solr.test.port>
             <javax.net.ssl.trustStore>${solr-ssl.trust-key-store.path}</javax.net.ssl.trustStore>
             <javax.net.ssl.trustStorePassword>secret</javax.net.ssl.trustStorePassword>
-            <solr.test.port>8983</solr.test.port>
-            <!--<dockerHostAddress>${docker.host.address}</dockerHostAddress>-->
 
             <talend.component.junit.handler.state>static</talend.component.junit.handler.state>
-
-            <!--<ssl.debug>true</ssl.debug>-->
-            <!--<javax.net.debug>ssl,handshake,verbose</javax.net.debug>-->
           </systemPropertyVariables>
         </configuration>
         <executions>
@@ -207,120 +188,6 @@
           </execution>
         </executions>
       </plugin>
-      <!--<plugin>-->
-      <!--<groupId>org.apache.maven.plugins</groupId>-->
-      <!--<artifactId>maven-compiler-plugin</artifactId>-->
-      <!--<version>3.7.0</version>-->
-      <!--<configuration>-->
-      <!--<source>1.8</source>-->
-      <!--<target>1.8</target>-->
-      <!--<forceJavacCompilerUse>true</forceJavacCompilerUse>-->
-      <!--<compilerId>javac</compilerId>-->
-      <!--<fork>true</fork>-->
-      <!--<compilerArgs>-->
-      <!--<arg>-parameters</arg>-->
-      <!--</compilerArgs>-->
-      <!--</configuration>-->
-      <!--</plugin>-->
-      <!--<plugin>-->
-      <!--<groupId>org.apache.maven.plugins</groupId>-->
-      <!--<artifactId>maven-surefire-plugin</artifactId>-->
-      <!--<version>${surefire.version}</version>-->
-      <!--<configuration>-->
-      <!--<trimStackTrace>false</trimStackTrace>-->
-      <!--<runOrder>alphabetical</runOrder>-->
-      <!--</configuration>-->
-      <!--</plugin>-->
-      <!--<plugin>-->
-      <!--<groupId>org.apache.maven.plugins</groupId>-->
-      <!--<artifactId>maven-failsafe-plugin</artifactId>-->
-      <!--<version>${failsafe.version}</version>-->
-      <!--<configuration>-->
-      <!--<includes>-->
-      <!--<include>**/*IT.java</include>-->
-      <!--</includes>-->
-      <!--<systemPropertyVariables>-->
-      <!--<javax.net.ssl.trustStore>-->
-      <!--${solr-ssl.trust-key-store.path}-->
-      <!--</javax.net.ssl.trustStore>-->
-      <!--<solr.test.port>${solr.port}</solr.test.port>-->
-      <!--<javax.net.ssl.trustStorePassword>secret</javax.net.ssl.trustStorePassword>-->
-      <!--<dockerHostAddress>${docker.host.address}</dockerHostAddress>-->
-      <!--</systemPropertyVariables>-->
-      <!--</configuration>-->
-      <!--<executions>-->
-      <!--<execution>-->
-      <!--<goals>-->
-      <!--<goal>integration-test</goal>-->
-      <!--<goal>verify</goal>-->
-      <!--</goals>-->
-      <!--</execution>-->
-      <!--</executions>-->
-      <!--<dependencies>-->
-      <!--<dependency>-->
-      <!--<groupId>org.junit.platform</groupId>-->
-      <!--<artifactId>junit-platform-surefire-provider</artifactId>-->
-      <!--<version>1.2.0</version>-->
-      <!--</dependency>-->
-      <!--<dependency>-->
-      <!--<groupId>org.junit.jupiter</groupId>-->
-      <!--<artifactId>junit-jupiter-engine</artifactId>-->
-      <!--<version>5.2.0</version>-->
-      <!--</dependency>-->
-      <!--</dependencies>-->
-      <!--</plugin>-->
-
-      <!--<plugin>-->
-        <!--<groupId>io.fabric8</groupId>-->
-        <!--<artifactId>docker-maven-plugin</artifactId>-->
-        <!--<version>${docker-maven-plugin.version}</version>-->
-        <!--<configuration>-->
-          <!--<showLogs>true</showLogs>-->
-          <!--<images>-->
-            <!--<image>-->
-              <!--<name>${docker-image.name}</name>-->
-              <!--<build>-->
-                <!--<dockerFileDir>-->
-                  <!--${dockerFile.directory}-->
-                <!--</dockerFileDir>-->
-              <!--</build>-->
-              <!--<run>-->
-                <!--<ports>-->
-                  <!--<port>solr.port:8983</port>-->
-                <!--</ports>-->
-                <!--<wait>-->
-                  <!--<http>-->
-                    <!--<url>https://${docker.host.address}:${solr.port}/solr</url>-->
-                    <!--<method>GET</method>-->
-                    <!--<allowAllHosts>true</allowAllHosts>-->
-                  <!--</http>-->
-                  <!--<time>300000</time>-->
-                <!--</wait>-->
-              <!--</run>-->
-            <!--</image>-->
-          <!--</images>-->
-        <!--</configuration>-->
-        <!--<executions>-->
-          <!--<execution>-->
-            <!--<id>start</id>-->
-            <!--<phase>pre-integration-test</phase>-->
-            <!--<goals>-->
-              <!--<goal>build</goal>-->
-              <!--<goal>start</goal>-->
-            <!--</goals>-->
-          <!--</execution>-->
-          <!--<execution>-->
-            <!--<id>stop</id>-->
-            <!--<phase>post-integration-test</phase>-->
-            <!--<goals>-->
-              <!--<goal>stop</goal>-->
-            <!--</goals>-->
-            <!--<configuration>-->
-              <!--<skip>${really.skip.tests}</skip>-->
-            <!--</configuration>-->
-          <!--</execution>-->
-        <!--</executions>-->
-      <!--</plugin>-->
 
       <plugin>
         <groupId>net.revelc.code.formatter</groupId>
