@@ -14,9 +14,8 @@ import java.util.List;
 
 @Data
 @DataSet("SolrDataSet")
-@GridLayout({ @GridLayout.Row({ "dataStore" }), @GridLayout.Row({ "core" }) })
+@GridLayout({ @GridLayout.Row({ "dataStore" }), @GridLayout.Row({ "core" }), @GridLayout.Row({ "schema" }) })
 @Documentation("Solr dataSet. Provide connection to Solr Data Collection")
-@GridLayout(value = { @GridLayout.Row({ "schema" }) }, names = { GridLayout.FormType.ADVANCED })
 
 public class SolrDataset implements Serializable {
 
