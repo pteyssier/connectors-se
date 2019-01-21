@@ -152,7 +152,6 @@ public class ZendeskHttpClientService {
         try {
             zendeskServiceClient.deleteTickets(firstId, CommonHelper.toPrimitives(idArray));
             tickets.forEach(ticket -> {
-                log.info("ticket was processed: " + ticket.toString());
                 JsonObject jsonObject = JsonHelper.toJsonObject(ticket, jsonReaderFactory);
                 success.emit(jsonObject);
             });
