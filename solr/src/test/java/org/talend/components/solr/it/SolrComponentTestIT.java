@@ -167,7 +167,6 @@ public class SolrComponentTestIT {
     @Test
     @DisplayName("Guess schema")
     void guessTableSchemaTest() {
-        // SolrConnectorService service = new SolrConnectorService();
         SolrInputMapperConfiguration config = new SolrInputMapperConfiguration();
         SolrConnectorUtils util = new SolrConnectorUtils();
         config.setDataset(testContext.getSolrConnection());
@@ -183,7 +182,6 @@ public class SolrComponentTestIT {
     @Test
     @DisplayName("Guess schema failed test")
     void guessSchemaFailedTest() {
-        // SolrConnectorService service = new SolrConnectorService();
         SolrInputMapperConfiguration config = new SolrInputMapperConfiguration();
         SolrConnectorUtils util = new SolrConnectorUtils();
         SolrDataset connection = new SolrDataset();
@@ -201,7 +199,6 @@ public class SolrComponentTestIT {
     @Test
     @DisplayName("Check Connection")
     void checkConnectionTest() {
-        // SolrConnectorService service = new SolrConnectorService();
         SolrConnectorUtils util = new SolrConnectorUtils();
         SolrDataStore dataStore = new SolrDataStore();
         dataStore.setUrl(testContext.getSolrConnection().getDataStore().getUrl());
@@ -214,7 +211,6 @@ public class SolrComponentTestIT {
     @Test
     @DisplayName("Check Failed Connection")
     void checkConnectionNegativeTest() {
-        // SolrConnectorService service = new SolrConnectorService();
         SolrConnectorUtils util = new SolrConnectorUtils();
         SolrDataStore dataStore = new SolrDataStore();
         dataStore.setUrl("http://localhost:8982/badsolrurl");
@@ -227,7 +223,6 @@ public class SolrComponentTestIT {
     @Test
     @DisplayName("Check suggestCore")
     void suggestTest() {
-        // SolrConnectorService service = new SolrConnectorService();
         SolrInputMapperConfiguration config = new SolrInputMapperConfiguration();
         SolrConnectorUtils util = new SolrConnectorUtils();
         config.setDataset(testContext.getSolrConnection());

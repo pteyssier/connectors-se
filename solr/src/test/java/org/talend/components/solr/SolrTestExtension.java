@@ -33,17 +33,9 @@ public class SolrTestExtension implements ExtensionContext.Store.CloseableResour
 
     private static final GenericContainer SOLR_CONTAINER = new GenericContainer(new ImageFromDockerfile()
             .withFileFromClasspath("Dockerfile", "solr-ssl-dockerfile/Dockerfile")
-            // .withDockerfileFromBuilder(builder -> builder
-            // .from("registry.datapwn.com/sbovsunovskyi/components-integration-test-magentocms:1.0.0")
-            // .copy("docker.cer", "/etc/ssl/certs/ssl-cert-snakeoil.pem")
-            // .copy("docker.key", "/etc/ssl/private/ssl-cert-snakeoil.key").build())
-
             .withFileFromPath("solr-ssl.keystore.jks", Paths.get("src/test/resources/solr-ssl-dockerfile/solr-ssl.keystore.jks"))
             .withFileFromPath("security.json", Paths.get("src/test/resources/solr-ssl-dockerfile/security.json")))
-                    .withExposedPorts(SOLR_PORT).waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(200)))
-    // .waitingFor(Wait.forHttps("/solr").forPort(SOLR_PORT).withBasicCredentials(LOGIN, PASSWORD)
-    // .forStatusCode(200).forStatusCode(401).withStartupTimeout(Duration.ofSeconds(120)))
-    ;
+                    .withExposedPorts(SOLR_PORT).waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(200)));
 
     private static boolean started = false;
 
