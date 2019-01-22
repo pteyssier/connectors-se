@@ -86,7 +86,7 @@
     <talend_oss_snapshots>https://artifacts-zl.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_oss_snapshots>
     <jms-api.version>2.0.1</jms-api.version>
     <activemq-client.version>5.15.6</activemq-client.version>
-
+    <junit-platform-surefire-provider.version>1.2.0</junit-platform-surefire-provider.version>
 
       <validation.model>true</validation.model>
   </properties>
