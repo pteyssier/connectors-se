@@ -16,18 +16,12 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeoutException;
 
-import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.talend.components.rabbitmq.datastore.RabbitMQDataStore;
-import org.talend.components.rabbitmq.output.ActionOnExchange;
-import org.talend.components.rabbitmq.output.ActionOnQueue;
 import org.talend.sdk.component.api.service.Service;
 import lombok.extern.slf4j.Slf4j;
 import javax.net.ssl.SSLContext;
-
-import static org.talend.components.rabbitmq.output.ActionOnExchange.DELETE_AND_CREATE_EXCHANGE;
-import static org.talend.components.rabbitmq.output.ActionOnQueue.DELETE_AND_CREATE_QUEUE;
 
 @Slf4j
 @Service
@@ -35,26 +29,6 @@ public class RabbitMQService {
 
     @Service
     private I18nMessage i18n;
-
-    public void onExchange(Channel channel, ActionOnExchange action, String exchangeName) {
-        try {
-            if (action == DELETE_AND_CREATE_EXCHANGE) {
-                channel.exchangeDelete(exchangeName);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(i18n.errorCantRemoveExchange());
-        }
-    }
-
-    public void onQueue(Channel channel, ActionOnQueue action, String queueName) {
-        try {
-            if (action == DELETE_AND_CREATE_QUEUE) {
-                channel.queueDelete(queueName);
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(i18n.errorCantRemoveQueue());
-        }
-    }
 
     public Connection getConnection(RabbitMQDataStore store) {
         ConnectionFactory factory = new ConnectionFactory();

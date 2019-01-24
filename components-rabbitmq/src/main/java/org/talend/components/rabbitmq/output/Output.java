@@ -22,6 +22,9 @@ import javax.json.JsonObject;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
+import org.talend.components.rabbitmq.publisher.ExchangePublisher;
+import org.talend.components.rabbitmq.publisher.MessagePublisher;
+import org.talend.components.rabbitmq.publisher.QueuePublisher;
 import org.talend.components.rabbitmq.service.I18nMessage;
 import org.talend.components.rabbitmq.service.RabbitMQService;
 import org.talend.sdk.component.api.component.Icon;
@@ -50,8 +53,10 @@ public class Output implements Serializable {
 
     private Channel channel;
 
+    private MessagePublisher publisher;
+
     public Output(@Option("configuration") final OutputConfiguration configuration, final RabbitMQService service,
-            final I18nMessage i18nMessage) {
+                  final I18nMessage i18nMessage) {
         this.configuration = configuration;
         this.service = service;
         this.i18n = i18nMessage;
@@ -62,40 +67,23 @@ public class Output implements Serializable {
         connection = service.getConnection(configuration.getBasicConfig().getConnection());
         try {
             channel = connection.createChannel();
-
             switch (configuration.getBasicConfig().getReceiverType()) {
-            case QUEUE:
-                service.onQueue(channel, configuration.getActionOnQueue(), configuration.getBasicConfig().getQueue());
-                channel.queueDeclare(configuration.getBasicConfig().getQueue(), configuration.getBasicConfig().getDurable(),
-                        false, configuration.getBasicConfig().getAutoDelete(), null);
-                break;
-            case EXCHANGE:
-                service.onExchange(channel, configuration.getActionOnExchange(), configuration.getBasicConfig().getExchange());
-                channel.exchangeDeclare(configuration.getBasicConfig().getExchange(),
-                        configuration.getBasicConfig().getExchangeType().getType(), configuration.getBasicConfig().getDurable(),
-                        configuration.getBasicConfig().getAutoDelete(), null);
-                break;
+                case QUEUE:
+                    publisher = new QueuePublisher(channel, configuration, i18n);
+                    break;
+                case EXCHANGE:
+                    publisher = new ExchangePublisher(channel, configuration, i18n);
+                    break;
             }
-
         } catch (IOException e) {
             throw new IllegalStateException(i18n.errorCreateRabbitMQInstance());
         }
-
     }
 
     @ElementListener
     public void onNext(@Input final JsonObject record) {
         try {
-            switch (configuration.getBasicConfig().getReceiverType()) {
-            case QUEUE:
-                channel.basicPublish("", configuration.getBasicConfig().getQueue(), null, getMessage(record).getBytes());
-                break;
-            case EXCHANGE:
-                channel.basicPublish(configuration.getBasicConfig().getExchange(), configuration.getBasicConfig().getRoutingKey(),
-                        null, getMessage(record).getBytes());
-                break;
-            }
-
+            publisher.publish(getMessage(record));
         } catch (IOException e) {
             throw new IllegalStateException(i18n.errorCantSendMessage());
         }
@@ -108,6 +96,5 @@ public class Output implements Serializable {
     @PreDestroy
     public void release() {
         service.closeConnection(connection);
-
     }
 }
