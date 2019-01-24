@@ -16,11 +16,14 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeoutException;
 
+import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import org.talend.components.rabbitmq.datastore.RabbitMQDataStore;
+import org.talend.components.rabbitmq.exception.CreateChannelException;
 import org.talend.sdk.component.api.service.Service;
 import lombok.extern.slf4j.Slf4j;
+
 import javax.net.ssl.SSLContext;
 
 @Slf4j
@@ -45,6 +48,16 @@ public class RabbitMQService {
         } catch (IOException | TimeoutException e) {
             throw new IllegalStateException(i18n.errorInvalidConnection());
         }
+    }
+
+    public Channel createChannel(Connection connection) {
+        Channel channel;
+        try {
+            channel = connection.createChannel();
+        } catch (IOException e) {
+            throw new CreateChannelException(i18n.errorCantCreateChannel(), e);
+        }
+        return channel;
     }
 
     private SSLContext getSSLContext() {

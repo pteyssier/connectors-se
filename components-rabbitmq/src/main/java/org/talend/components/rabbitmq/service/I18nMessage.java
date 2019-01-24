@@ -29,7 +29,11 @@ public interface I18nMessage {
 
     String errorTLS();
 
-    String errorCreateRabbitMQInstance();
+    String errorCantCreateChannel();
+
+    String errorCantDeclareQueue();
+
+    String errorCantDeclareExchange();
 
     String errorCantSendMessage();
 

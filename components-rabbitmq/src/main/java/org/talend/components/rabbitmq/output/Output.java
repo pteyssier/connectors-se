@@ -56,7 +56,7 @@ public class Output implements Serializable {
     private MessagePublisher publisher;
 
     public Output(@Option("configuration") final OutputConfiguration configuration, final RabbitMQService service,
-                  final I18nMessage i18nMessage) {
+            final I18nMessage i18nMessage) {
         this.configuration = configuration;
         this.service = service;
         this.i18n = i18nMessage;
@@ -65,18 +65,15 @@ public class Output implements Serializable {
     @PostConstruct
     public void init() {
         connection = service.getConnection(configuration.getBasicConfig().getConnection());
-        try {
-            channel = connection.createChannel();
-            switch (configuration.getBasicConfig().getReceiverType()) {
-                case QUEUE:
-                    publisher = new QueuePublisher(channel, configuration, i18n);
-                    break;
-                case EXCHANGE:
-                    publisher = new ExchangePublisher(channel, configuration, i18n);
-                    break;
-            }
-        } catch (IOException e) {
-            throw new IllegalStateException(i18n.errorCreateRabbitMQInstance());
+        channel = service.createChannel(connection);
+
+        switch (configuration.getBasicConfig().getReceiverType()) {
+        case QUEUE:
+            publisher = new QueuePublisher(channel, configuration, i18n);
+            break;
+        case EXCHANGE:
+            publisher = new ExchangePublisher(channel, configuration, i18n);
+            break;
         }
     }
 

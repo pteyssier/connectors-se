@@ -25,6 +25,8 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.GetResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.talend.components.rabbitmq.exception.ExchangeDeclareException;
+import org.talend.components.rabbitmq.exception.QueueDeclareException;
 import org.talend.components.rabbitmq.service.I18nMessage;
 import org.talend.components.rabbitmq.service.RabbitMQService;
 import org.talend.sdk.component.api.configuration.Option;
@@ -64,26 +66,29 @@ public class InputSource implements Serializable {
     @PostConstruct
     public void init() {
         connection = service.getConnection(configuration.getBasicConfig().getConnection());
-        try {
-            channel = connection.createChannel();
+        channel = service.createChannel(connection);
 
-            switch (configuration.getBasicConfig().getReceiverType()) {
-            case QUEUE:
-                exchangeQueueName = configuration.getBasicConfig().getQueue();
+        switch (configuration.getBasicConfig().getReceiverType()) {
+        case QUEUE:
+            exchangeQueueName = configuration.getBasicConfig().getQueue();
+            try {
                 channel.queueDeclare(configuration.getBasicConfig().getQueue(), configuration.getBasicConfig().getDurable(),
                         false, configuration.getBasicConfig().getAutoDelete(), null);
-                break;
-            case EXCHANGE:
+            } catch (IOException e) {
+                throw new QueueDeclareException(i18n.errorCantDeclareQueue(), e);
+            }
+            break;
+        case EXCHANGE:
+            try {
                 channel.exchangeDeclare(configuration.getBasicConfig().getExchange(),
                         configuration.getBasicConfig().getExchangeType().getType());
                 exchangeQueueName = channel.queueDeclare().getQueue();
                 channel.queueBind(exchangeQueueName, configuration.getBasicConfig().getExchange(),
                         configuration.getBasicConfig().getRoutingKey());
-                break;
+            } catch (IOException e) {
+                throw new ExchangeDeclareException(i18n.errorCantDeclareExchange(), e);
             }
-
-        } catch (IOException e) {
-            throw new IllegalStateException(i18n.errorCreateRabbitMQInstance());
+            break;
         }
     }
 

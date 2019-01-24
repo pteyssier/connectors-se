@@ -1,6 +1,7 @@
 package org.talend.components.rabbitmq.publisher;
 
 import com.rabbitmq.client.Channel;
+import org.talend.components.rabbitmq.exception.QueueDeleteException;
 import org.talend.components.rabbitmq.output.ActionOnQueue;
 import org.talend.components.rabbitmq.output.OutputConfiguration;
 import org.talend.components.rabbitmq.service.I18nMessage;
@@ -17,13 +18,17 @@ public class QueuePublisher implements MessagePublisher {
 
     private String queue;
 
-    public QueuePublisher(Channel channel, OutputConfiguration configuration, final I18nMessage i18nMessage) throws IOException {
+    public QueuePublisher(Channel channel, OutputConfiguration configuration, final I18nMessage i18nMessage) {
         this.channel = channel;
         this.queue = configuration.getBasicConfig().getQueue();
         this.i18n = i18nMessage;
         onQueue(channel, configuration.getActionOnQueue(), queue);
-        channel.queueDeclare(configuration.getBasicConfig().getQueue(), configuration.getBasicConfig().getDurable(), false,
-                configuration.getBasicConfig().getAutoDelete(), null);
+        try {
+            channel.queueDeclare(configuration.getBasicConfig().getQueue(), configuration.getBasicConfig().getDurable(), false,
+                    configuration.getBasicConfig().getAutoDelete(), null);
+        } catch (IOException e) {
+            throw new QueueDeleteException(i18n.errorCantDeclareQueue(), e);
+        }
     }
 
     private void onQueue(Channel channel, ActionOnQueue action, String queueName) {
@@ -32,7 +37,7 @@ public class QueuePublisher implements MessagePublisher {
                 channel.queueDelete(queueName);
             }
         } catch (IOException e) {
-            throw new IllegalStateException(i18n.errorCantRemoveQueue());
+            throw new QueueDeleteException(i18n.errorCantRemoveQueue(), e);
         }
     }
 

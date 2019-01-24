@@ -1,6 +1,8 @@
 package org.talend.components.rabbitmq.publisher;
 
 import com.rabbitmq.client.Channel;
+import org.talend.components.rabbitmq.exception.ExchangeDeclareException;
+import org.talend.components.rabbitmq.exception.ExchangeDeleteException;
 import org.talend.components.rabbitmq.output.ActionOnExchange;
 import org.talend.components.rabbitmq.output.OutputConfiguration;
 import org.talend.components.rabbitmq.service.I18nMessage;
@@ -21,15 +23,19 @@ public class ExchangePublisher implements MessagePublisher {
 
     private String routingKey;
 
-    public ExchangePublisher(Channel channel, OutputConfiguration configuration, final I18nMessage i18nMessage) throws IOException {
+    public ExchangePublisher(Channel channel, OutputConfiguration configuration, final I18nMessage i18nMessage) {
         this.channel = channel;
         this.routingKey = configuration.getBasicConfig().getRoutingKey();
         this.exchange = configuration.getBasicConfig().getExchange();
         this.i18n = i18nMessage;
         onExchange(channel, configuration.getActionOnExchange(), exchange);
-        channel.exchangeDeclare(configuration.getBasicConfig().getExchange(),
-                configuration.getBasicConfig().getExchangeType().getType(), configuration.getBasicConfig().getDurable(),
-                configuration.getBasicConfig().getAutoDelete(), null);
+        try {
+            channel.exchangeDeclare(configuration.getBasicConfig().getExchange(),
+                    configuration.getBasicConfig().getExchangeType().getType(), configuration.getBasicConfig().getDurable(),
+                    configuration.getBasicConfig().getAutoDelete(), null);
+        } catch (IOException e) {
+            throw new ExchangeDeclareException(i18n.errorCantDeclareExchange(), e);
+        }
     }
 
     @Override
@@ -43,7 +49,7 @@ public class ExchangePublisher implements MessagePublisher {
                 channel.exchangeDelete(exchangeName);
             }
         } catch (IOException e) {
-            throw new IllegalStateException(i18n.errorCantRemoveExchange());
+            throw new ExchangeDeleteException(i18n.errorCantRemoveExchange(), e);
         }
     }
 }
