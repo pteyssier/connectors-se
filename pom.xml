@@ -87,7 +87,7 @@
 
     <docker-maven-plugin.version>0.26.0</docker-maven-plugin.version>
     <amqp-client.version>5.4.3</amqp-client.version>
-
+    <testcontainers.version>1.10.3</testcontainers.version>
     <validation.model>true</validation.model>
     <talend_oss_snapshots>https://artifacts-zl.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_oss_snapshots>
   </properties>

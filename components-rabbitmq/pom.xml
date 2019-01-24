@@ -42,6 +42,12 @@
             <groupId>com.rabbitmq</groupId>
             <artifactId>amqp-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -127,7 +133,6 @@
                         <include>**/*IT.java</include>
                     </includes>
                     <systemPropertyVariables>
-                        <amqp.port>${amqp.port}</amqp.port>
                         <javax.net.ssl.keyStore>src/test/resources/client_key.p12</javax.net.ssl.keyStore>
                         <javax.net.ssl.keyStorePassword>password</javax.net.ssl.keyStorePassword>
                         <javax.net.ssl.trustStore>src/test/resources/rabbitstore</javax.net.ssl.trustStore>
@@ -170,51 +175,6 @@
                         <version>${junit5.version}</version>
                     </dependency>
                 </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>io.fabric8</groupId>
-                <artifactId>docker-maven-plugin</artifactId>
-                <version>${docker-maven-plugin.version}</version>
-                <configuration>
-                    <skip>${skipTests}</skip>
-                    <registry>registry.datapwn.com</registry>
-                    <images>
-                        <image>
-                            <alias>rmqtest</alias>
-                            <name>vizotenko/components-integration-test-rabbitmq:1.0.0</name>
-                            <run>
-                                <ports>
-                                    <port>amqp.port:5671</port>
-                                </ports>
-                                <wait>
-                                    <tcp>
-                                        <host>localhost</host>
-                                        <ports>
-                                            <port>5671</port>
-                                        </ports>
-                                    </tcp>
-                                    <time>60000</time>
-                                </wait>
-                            </run>
-                        </image>
-                    </images>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>start</id>
-                        <phase>pre-integration-test</phase>
-                        <goals>
-                            <goal>start</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>stop</id>
-                        <phase>post-integration-test</phase>
-                        <goals>
-                            <goal>stop</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>

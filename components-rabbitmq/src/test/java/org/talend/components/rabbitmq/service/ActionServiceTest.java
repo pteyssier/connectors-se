@@ -56,7 +56,7 @@ class ActionServiceTest {
     @Test
     public void testConnectionEmptyPort() {
         RabbitMQDataStore dataStore = new RabbitMQDataStore();
-        dataStore.setHostname("localhost");
+        dataStore.setHostname(HOSTNAME);
         dataStore.setPort(null);
         assertThrows(IllegalArgumentException.class, () -> {
             actionService.validateBasicDatastore(dataStore);

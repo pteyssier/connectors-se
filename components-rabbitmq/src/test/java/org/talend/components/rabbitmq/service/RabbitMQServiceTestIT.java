@@ -4,7 +4,11 @@ import com.rabbitmq.client.BuiltinExchangeType;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.talend.components.rabbitmq.RabbitMQTestExtention;
 import org.talend.components.rabbitmq.configuration.BasicConfiguration;
 import org.talend.components.rabbitmq.configuration.ExchangeType;
 import org.talend.components.rabbitmq.configuration.ReceiverType;
@@ -12,6 +16,7 @@ import org.talend.components.rabbitmq.datastore.RabbitMQDataStore;
 import org.talend.components.rabbitmq.output.OutputConfiguration;
 import org.talend.components.rabbitmq.source.InputMapperConfiguration;
 import org.talend.sdk.component.api.service.Service;
+import org.talend.sdk.component.api.service.healthcheck.HealthCheckStatus;
 import org.talend.sdk.component.junit.BaseComponentsHandler;
 import org.talend.sdk.component.junit5.Injected;
 import org.talend.sdk.component.junit5.WithComponents;
@@ -34,6 +39,8 @@ import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.*;
 import static org.talend.sdk.component.junit.SimpleFactory.configurationByExample;
 
 @WithComponents("org.talend.components.rabbitmq") // component package
+@ExtendWith(RabbitMQTestExtention.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class RabbitMQServiceTestIT {
 
     @Injected
@@ -44,6 +51,16 @@ public class RabbitMQServiceTestIT {
 
     @Service
     private RabbitMQService service;
+
+    @Service
+    private ActionService actionService;
+
+    private RabbitMQTestExtention.TestContext testContext;
+
+    @BeforeAll
+    private void init(RabbitMQTestExtention.TestContext testContext) {
+        this.testContext = testContext;
+    }
 
     @Test
     public void sendAndReceiveQueueMessage() {
@@ -138,6 +155,13 @@ public class RabbitMQServiceTestIT {
                 "Sent and received messages should be equal");
     }
 
+    @Test
+    public void testSuccessfulConnection() {
+        HealthCheckStatus status = actionService.validateBasicDatastore(testContext.getDataStore());
+
+        assertEquals(HealthCheckStatus.Status.OK, status.getStatus());
+    }
+
     private void sendMessageToExchange(RabbitMQDataStore store, BuiltinExchangeType exchangeType, String exchangeName) {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(store.getHostname());
@@ -160,12 +184,7 @@ public class RabbitMQServiceTestIT {
 
     private BasicConfiguration getBasicConfiguration() {
         BasicConfiguration basicConfiguration = new BasicConfiguration();
-        RabbitMQDataStore dataStore = new RabbitMQDataStore();
-        dataStore.setHostname(HOSTNAME);
-        dataStore.setPort(Integer.valueOf(PORT));
-        dataStore.setUserName(USER_NAME);
-        dataStore.setPassword(PASSWORD);
-        dataStore.setTLS(true);
+        RabbitMQDataStore dataStore = testContext.getDataStore();
         basicConfiguration.setQueue(QUEUE_NAME);
         basicConfiguration.setExchange(FANOUT_EXCHANGE_NAME);
         basicConfiguration.setReceiverType(ReceiverType.QUEUE);
