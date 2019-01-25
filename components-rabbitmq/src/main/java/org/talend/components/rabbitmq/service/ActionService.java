@@ -66,8 +66,8 @@ public class ActionService {
         Connection connection = null;
         try {
             connection = rabbitMQService.getConnection(datastore);
-        } catch (IllegalStateException e) {
-            return new HealthCheckStatus(HealthCheckStatus.Status.KO, i18n.errorInvalidConnection());
+        } catch (Exception e) {
+            return new HealthCheckStatus(HealthCheckStatus.Status.KO, e.getMessage());
         } finally {
             rabbitMQService.closeConnection(connection);
         }

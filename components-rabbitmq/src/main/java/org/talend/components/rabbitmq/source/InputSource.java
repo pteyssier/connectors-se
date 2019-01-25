@@ -14,6 +14,8 @@ package org.talend.components.rabbitmq.source;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.TimeoutException;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -64,7 +66,7 @@ public class InputSource implements Serializable {
     }
 
     @PostConstruct
-    public void init() {
+    public void init() throws IOException, TimeoutException, NoSuchAlgorithmException {
         connection = service.getConnection(configuration.getBasicConfig().getConnection());
         channel = service.createChannel(connection);
 

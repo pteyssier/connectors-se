@@ -33,21 +33,16 @@ public class RabbitMQService {
     @Service
     private I18nMessage i18n;
 
-    public Connection getConnection(RabbitMQDataStore store) {
+    public Connection getConnection(RabbitMQDataStore store) throws IOException, TimeoutException, NoSuchAlgorithmException {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setUsername(store.getUserName());
         factory.setPassword(store.getPassword());
         factory.setHost(store.getHostname());
         factory.setPort(store.getPort());
-
         if (store.getTLS()) {
-            factory.useSslProtocol(getSSLContext());
+            factory.useSslProtocol(SSLContext.getDefault());
         }
-        try {
-            return factory.newConnection();
-        } catch (IOException | TimeoutException e) {
-            throw new IllegalStateException(i18n.errorInvalidConnection());
-        }
+        return factory.newConnection();
     }
 
     public Channel createChannel(Connection connection) {
@@ -58,17 +53,6 @@ public class RabbitMQService {
             throw new CreateChannelException(i18n.errorCantCreateChannel(), e);
         }
         return channel;
-    }
-
-    private SSLContext getSSLContext() {
-        SSLContext sslContext;
-        try {
-            sslContext = SSLContext.getDefault();
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(i18n.errorTLS());
-        }
-
-        return sslContext;
     }
 
     public void closeConnection(Connection connection) {

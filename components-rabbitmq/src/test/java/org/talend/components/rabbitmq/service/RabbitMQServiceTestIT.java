@@ -27,6 +27,7 @@ import javax.json.JsonObject;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
@@ -170,7 +171,7 @@ public class RabbitMQServiceTestIT {
         try (Connection connection = service.getConnection(store); Channel channel = connection.createChannel()) {
             channel.exchangeDeclare(exchangeName, exchangeType);
             channel.basicPublish(exchangeName, "", null, TEST_MESSAGE.getBytes(StandardCharsets.UTF_8));
-        } catch (IOException | TimeoutException e) {
+        } catch (IOException | TimeoutException | NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
     }
