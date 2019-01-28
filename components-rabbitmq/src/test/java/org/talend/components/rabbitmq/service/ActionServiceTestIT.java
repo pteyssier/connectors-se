@@ -25,10 +25,9 @@ class ActionServiceTestIT {
     private RabbitMQDataStore dataStore;
 
     @BeforeAll
-    private void init(RabbitMQTestExtention.TestContext testContext) throws InterruptedException {
+    private void init(RabbitMQTestExtention.TestContext testContext) {
         this.testContext = testContext;
         this.dataStore = testContext.getDataStore();
-        Thread.sleep(6000);
     }
 
     @Test
