@@ -10,9 +10,15 @@ import org.talend.sdk.component.junit5.WithComponents;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.talend.components.rabbitmq.MessageConst.MESSAGE_CONTENT;
-import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.*;
+import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.HOSTNAME;
+import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.PASSWORD;
+import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.PORT;
+import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.USER_NAME;
 
 @WithComponents("org.talend.components.rabbitmq")
 class ActionServiceTest {

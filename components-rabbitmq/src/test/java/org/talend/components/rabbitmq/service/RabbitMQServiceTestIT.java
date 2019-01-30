@@ -36,7 +36,11 @@ import static java.util.Arrays.asList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.talend.components.rabbitmq.MessageConst.MESSAGE_CONTENT;
-import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.*;
+import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.TEST_MESSAGE;
+import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.FANOUT_EXCHANGE_NAME;
+import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.DIRECT_EXCHANGE_NAME;
+import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.QUEUE_NAME;
+import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.MAXIMUM_MESSAGES;
 import static org.talend.sdk.component.junit.SimpleFactory.configurationByExample;
 
 @WithComponents("org.talend.components.rabbitmq") // component package
