@@ -95,18 +95,14 @@ public class InputSource implements Serializable {
     }
 
     @Producer
-    public JsonObject next() {
+    public JsonObject next() throws IOException {
         final String[] textMessage = { null };
-        try {
-            do {
-                GetResponse response = channel.basicGet(exchangeQueueName, true);
-                if (response != null) {
-                    textMessage[0] = new String(response.getBody());
-                }
-            } while (textMessage[0] == null && counter < configuration.getMaximumMessages());
-        } catch (IOException e) {
-            log.error(i18n.errorCantReceiveMessage(), e);
-        }
+        do {
+            GetResponse response = channel.basicGet(exchangeQueueName, true);
+            if (response != null) {
+                textMessage[0] = new String(response.getBody());
+            }
+        } while (textMessage[0] == null && counter < configuration.getMaximumMessages());
 
         return textMessage[0] != null ? buildJSON(textMessage[0]) : null;
     }

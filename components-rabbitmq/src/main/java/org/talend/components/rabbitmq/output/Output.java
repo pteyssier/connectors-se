@@ -80,12 +80,8 @@ public class Output implements Serializable {
     }
 
     @ElementListener
-    public void onNext(@Input final JsonObject record) {
-        try {
-            publisher.publish(getMessage(record));
-        } catch (IOException e) {
-            throw new IllegalStateException(i18n.errorCantSendMessage());
-        }
+    public void onNext(@Input final JsonObject record) throws IOException {
+        publisher.publish(getMessage(record));
     }
 
     private String getMessage(JsonObject record) {
