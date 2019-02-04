@@ -1,4 +1,4 @@
-FROM bitnami/rabbitmq:latest
+FROM bitnami/rabbitmq:3.7.11
 USER root
 COPY /bitnami /bitnami/
 

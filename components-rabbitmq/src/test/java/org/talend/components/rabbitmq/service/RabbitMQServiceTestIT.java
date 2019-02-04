@@ -30,6 +30,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static java.util.Arrays.asList;
@@ -90,19 +92,19 @@ public class RabbitMQServiceTestIT {
 
     @Test
     public void receiveFanoutMessage() {
-        Runnable runnable = () -> {
+        OutputConfiguration outputConfiguration = getOutputConfiguration();
+        outputConfiguration.getBasicConfig().setReceiverType(ReceiverType.EXCHANGE);
+        CountDownLatch count = new CountDownLatch(1);
+        Thread thread = new Thread(() -> {
             try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            OutputConfiguration outputConfiguration = getOutputConfiguration();
-            outputConfiguration.getBasicConfig().setReceiverType(ReceiverType.EXCHANGE);
-            sendMessageToExchange(outputConfiguration.getBasicConfig().getConnection(), BuiltinExchangeType.FANOUT,
-                    FANOUT_EXCHANGE_NAME);
-        };
+                count.await(30, TimeUnit.SECONDS);
+                sendMessageToExchange(outputConfiguration.getBasicConfig().getConnection(), BuiltinExchangeType.FANOUT,
+                        FANOUT_EXCHANGE_NAME);
 
-        Thread thread = new Thread(runnable);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
         thread.start();
 
         InputMapperConfiguration inputConfiguration = getInputConfiguration();
@@ -126,19 +128,19 @@ public class RabbitMQServiceTestIT {
 
     @Test
     public void receiveDirectMessage() {
-        Runnable runnable = () -> {
+        OutputConfiguration outputConfiguration = getOutputConfiguration();
+        outputConfiguration.getBasicConfig().setReceiverType(ReceiverType.EXCHANGE);
+        CountDownLatch count = new CountDownLatch(1);
+        Thread thread = new Thread(() -> {
             try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            OutputConfiguration outputConfiguration = getOutputConfiguration();
-            outputConfiguration.getBasicConfig().setReceiverType(ReceiverType.EXCHANGE);
-            sendMessageToExchange(outputConfiguration.getBasicConfig().getConnection(), BuiltinExchangeType.DIRECT,
-                    DIRECT_EXCHANGE_NAME);
-        };
+                count.await(30, TimeUnit.SECONDS);
+                sendMessageToExchange(outputConfiguration.getBasicConfig().getConnection(), BuiltinExchangeType.DIRECT,
+                        DIRECT_EXCHANGE_NAME);
 
-        Thread thread = new Thread(runnable);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
         thread.start();
 
         InputMapperConfiguration inputConfiguration = getInputConfiguration();
@@ -148,8 +150,8 @@ public class RabbitMQServiceTestIT {
 
         final String inputConfig = configurationByExample().forInstance(inputConfiguration).configured().toQueryString();
 
-        Job.components().component("rabbitmq-output", "RabbitMQ://Input?" + inputConfig)
-                .component("collector", "test://collector").connections().from("rabbitmq-output").to("collector").build().run();
+        Job.components().component("rabbitmq-input", "RabbitMQ://Input?" + inputConfig).component("collector", "test://collector")
+                .connections().from("rabbitmq-input").to("collector").build().run();
 
         final List<JsonObject> res = componentsHandler.getCollectedData(JsonObject.class);
         Optional optional = res.stream().findFirst();
@@ -176,7 +178,7 @@ public class RabbitMQServiceTestIT {
             channel.exchangeDeclare(exchangeName, exchangeType);
             channel.basicPublish(exchangeName, "", null, TEST_MESSAGE.getBytes(StandardCharsets.UTF_8));
         } catch (IOException | TimeoutException | NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
