@@ -1,6 +1,7 @@
 package org.talend.components.rabbitmq.publisher;
 
 import com.rabbitmq.client.Channel;
+import org.talend.components.rabbitmq.exception.QueueDeclareException;
 import org.talend.components.rabbitmq.exception.QueueDeleteException;
 import org.talend.components.rabbitmq.output.ActionOnQueue;
 import org.talend.components.rabbitmq.output.OutputConfiguration;
@@ -27,7 +28,7 @@ public class QueuePublisher implements MessagePublisher {
             channel.queueDeclare(configuration.getBasicConfig().getQueue(), configuration.getBasicConfig().getDurable(), false,
                     configuration.getBasicConfig().getAutoDelete(), null);
         } catch (IOException e) {
-            throw new QueueDeleteException(i18n.errorCantDeclareQueue(), e);
+            throw new QueueDeclareException(i18n.errorCantDeclareQueue(), e);
         }
     }
 
