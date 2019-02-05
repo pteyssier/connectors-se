@@ -103,7 +103,7 @@ public class RabbitMQServiceTestIT {
 
         Thread thread = new Thread(() -> {
             while (true) {
-                if (isConnected()) {
+                if (isInputSubscribed()) {
                     sendMessageToExchange(outputConfiguration.getBasicConfig().getConnection(), BuiltinExchangeType.FANOUT,
                             FANOUT_EXCHANGE_NAME);
                     break;
@@ -140,7 +140,7 @@ public class RabbitMQServiceTestIT {
 
         Thread thread = new Thread(() -> {
             while (true) {
-                if (isConnected()) {
+                if (isInputSubscribed()) {
                     sendMessageToExchange(outputConfiguration.getBasicConfig().getConnection(), BuiltinExchangeType.DIRECT,
                             DIRECT_EXCHANGE_NAME);
                     break;
@@ -208,7 +208,7 @@ public class RabbitMQServiceTestIT {
         return configuration;
     }
 
-    private boolean isConnected() {
+    private boolean isInputSubscribed() {
         return !client.getConnections().isEmpty()
                 && client.getConnection(client.getConnections().get(0).getName()).getChannels() > 0;
     }
