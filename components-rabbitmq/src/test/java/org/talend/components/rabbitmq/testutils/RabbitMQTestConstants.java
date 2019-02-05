@@ -6,6 +6,8 @@ public class RabbitMQTestConstants {
 
     public static final Integer PORT = 5671;
 
+    public final static Integer HTTP_PORT = 15672;
+
     public static final String USER_NAME = "user";
 
     public static final String PASSWORD = "bitnami";

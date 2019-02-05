@@ -88,6 +88,10 @@
     <docker-maven-plugin.version>0.26.0</docker-maven-plugin.version>
     <amqp-client.version>5.4.3</amqp-client.version>
     <testcontainers.version>1.10.3</testcontainers.version>
+    <spring-web.version>5.1.4.RELEASE</spring-web.version>
+    <rabbitmq.httpclient.version>3.1.0.RELEASE</rabbitmq.httpclient.version>
+    <apache.httpclient.version>4.5.7</apache.httpclient.version>
+
     <validation.model>true</validation.model>
     <talend_oss_snapshots>https://artifacts-zl.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_oss_snapshots>
   </properties>
@@ -201,6 +205,21 @@
         <groupId>com.rabbitmq</groupId>
         <artifactId>amqp-client</artifactId>
         <version>5.4.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-web</artifactId>
+        <version>${spring-web.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.rabbitmq</groupId>
+        <artifactId>http-client</artifactId>
+        <version>${rabbitmq.httpclient.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>${apache.httpclient.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

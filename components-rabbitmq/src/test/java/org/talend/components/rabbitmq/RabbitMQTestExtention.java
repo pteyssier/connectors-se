@@ -15,21 +15,20 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
+import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.HTTP_PORT;
 import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.PASSWORD;
+import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.PORT;
 import static org.talend.components.rabbitmq.testutils.RabbitMQTestConstants.USER_NAME;
 
 @Slf4j
 public class RabbitMQTestExtention implements ExtensionContext.Store.CloseableResource, BeforeAllCallback, ParameterResolver {
-
-    private final static int RABBITMQ_PORT = 5671;
 
     private TestContext testContext = new TestContext();
 
     private static final GenericContainer RABBITMQ_CONTAINER = new GenericContainer(
             new ImageFromDockerfile().withDockerfileFromBuilder(
                     builder -> builder.from("registry.datapwn.com/vizotenko/components-integration-test-rabbitmq:1.0.0").build()))
-                            .withExposedPorts(RABBITMQ_PORT)
-                            .waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(200)));
+                            .withExposedPorts(PORT).waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(200)));
 
     private static boolean started = false;
 
@@ -44,18 +43,19 @@ public class RabbitMQTestExtention implements ExtensionContext.Store.CloseableRe
         }
 
         String dockerHostAddress = RABBITMQ_CONTAINER.getContainerIpAddress();
-        Integer activemqHttpPort = RABBITMQ_CONTAINER.getMappedPort(RABBITMQ_PORT);
+        Integer amqpPort = RABBITMQ_CONTAINER.getMappedPort(PORT);
 
         RabbitMQDataStore dataStore = new RabbitMQDataStore();
 
         dataStore.setHostname(dockerHostAddress);
-        dataStore.setPort(activemqHttpPort);
+        dataStore.setPort(amqpPort);
         dataStore.setTLS(true);
         dataStore.setUserName(USER_NAME);
         dataStore.setPassword(PASSWORD);
         testContext.dataStore = dataStore;
+        testContext.httpPort = RABBITMQ_CONTAINER.getMappedPort(HTTP_PORT);
 
-        log.info("docker machine: " + dockerHostAddress + ":" + activemqHttpPort);
+        log.info("docker machine: " + dockerHostAddress + ":" + amqpPort);
     }
 
     @Override
@@ -80,5 +80,6 @@ public class RabbitMQTestExtention implements ExtensionContext.Store.CloseableRe
     public static class TestContext {
 
         private RabbitMQDataStore dataStore;
+        private Integer httpPort;
     }
 }
