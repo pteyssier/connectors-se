@@ -22,17 +22,14 @@ class ActionServiceTestIT {
 
     private RabbitMQTestExtention.TestContext testContext;
 
-    private RabbitMQDataStore dataStore;
-
     @BeforeAll
     private void init(RabbitMQTestExtention.TestContext testContext) {
         this.testContext = testContext;
-        this.dataStore = testContext.getDataStore();
     }
 
     @Test
     public void testSuccessfulConnection() {
-        HealthCheckStatus status = actionService.validateBasicDatastore(dataStore);
+        HealthCheckStatus status = actionService.validateBasicDatastore(testContext.getDataStore());
 
         assertEquals(HealthCheckStatus.Status.OK, status.getStatus());
     }

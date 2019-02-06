@@ -80,6 +80,7 @@ public class RabbitMQTestExtention implements ExtensionContext.Store.CloseableRe
     public static class TestContext {
 
         private RabbitMQDataStore dataStore;
+
         private Integer httpPort;
     }
 }
