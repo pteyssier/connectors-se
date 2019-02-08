@@ -50,7 +50,7 @@ import static org.talend.sdk.component.junit.SimpleFactory.configurationByExampl
 @WithComponents("org.talend.components.rabbitmq") // component package
 @ExtendWith(RabbitMQTestExtention.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class RabbitMQServiceTestIT {
+public class RabbitMQTestIT {
 
     @Injected
     private BaseComponentsHandler componentsHandler;
