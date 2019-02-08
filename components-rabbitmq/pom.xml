@@ -149,6 +149,8 @@
                         <javax.net.ssl.keyStorePassword>password</javax.net.ssl.keyStorePassword>
                         <javax.net.ssl.trustStore>${project.basedir}/src/test/resources/rabbitstore</javax.net.ssl.trustStore>
                         <javax.net.ssl.trustStorePassword>password</javax.net.ssl.trustStorePassword>
+                        <ssl.debug>true</ssl.debug>
+                        <javax.net.debug>ssl,handshake,verbose</javax.net.debug>
                         <talend.component.junit.handler.state>static</talend.component.junit.handler.state>
                     </systemPropertyVariables>
                 </configuration>
