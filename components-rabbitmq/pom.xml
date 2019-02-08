@@ -145,9 +145,9 @@
                         <include>**/*IT.java</include>
                     </includes>
                     <systemPropertyVariables>
-                        <javax.net.ssl.keyStore>src/test/resources/client_key.p12</javax.net.ssl.keyStore>
+                        <javax.net.ssl.keyStore>${project.basedir}/src/test/resources/client_key.p12</javax.net.ssl.keyStore>
                         <javax.net.ssl.keyStorePassword>password</javax.net.ssl.keyStorePassword>
-                        <javax.net.ssl.trustStore>src/test/resources/rabbitstore</javax.net.ssl.trustStore>
+                        <javax.net.ssl.trustStore>${project.basedir}/src/test/resources/rabbitstore</javax.net.ssl.trustStore>
                         <javax.net.ssl.trustStorePassword>password</javax.net.ssl.trustStorePassword>
                         <talend.component.junit.handler.state>static</talend.component.junit.handler.state>
                     </systemPropertyVariables>
