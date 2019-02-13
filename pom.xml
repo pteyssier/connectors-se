@@ -33,9 +33,9 @@
   </licenses>
 
   <modules>
-    <module>processing-tck</module>
-    <module>jdbc</module>
-    <module>salesforce</module>
+    <!--<module>processing-tck</module>-->
+    <!--<module>jdbc</module>-->
+    <!--<module>salesforce</module>-->
     <module>components-rabbitmq</module>
   </modules>
 
