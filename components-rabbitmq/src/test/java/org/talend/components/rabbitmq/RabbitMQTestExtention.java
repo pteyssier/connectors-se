@@ -25,10 +25,20 @@ public class RabbitMQTestExtention implements ExtensionContext.Store.CloseableRe
 
     private TestContext testContext = new TestContext();
 
+    // private static final GenericContainer RABBITMQ_CONTAINER = new GenericContainer(
+    // new ImageFromDockerfile().withDockerfileFromBuilder(
+    // builder -> builder.from("registry.datapwn.com/vizotenko/components-integration-test-rabbitmq:1.0.0").build()))
+    // .withExposedPorts(PORT).waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(200)));
+
     private static final GenericContainer RABBITMQ_CONTAINER = new GenericContainer(
-            new ImageFromDockerfile().withDockerfileFromBuilder(
-                    builder -> builder.from("registry.datapwn.com/vizotenko/components-integration-test-rabbitmq:1.0.0").build()))
-                            .withExposedPorts(PORT).waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(200)));
+            new ImageFromDockerfile().withFileFromClasspath("Dockerfile", "docker/Dockerfile")
+                    .withFileFromClasspath("rabbitmq.config", "docker/rabbitmq.config")
+                    .withFileFromClasspath("server_certificate.pem", "docker/server_certificate.pem")
+                    .withFileFromClasspath("server_key.pem", "docker/server_key.pem")
+                    .withFileFromClasspath("ca_certificate.pem", "docker/ca_certificate.pem")
+    // .withFileFromPath("solr-ssl.keystore.jks", Paths.get("src/test/resources/solr-ssl-dockerfile/solr-ssl.keystore.jks"))
+    // .withFileFromPath("security.json", Paths.get("src/test/resources/solr-ssl-dockerfile/security.json")))
+    ).withExposedPorts(PORT).waitingFor(Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(200)));
 
     private static boolean started = false;
 
