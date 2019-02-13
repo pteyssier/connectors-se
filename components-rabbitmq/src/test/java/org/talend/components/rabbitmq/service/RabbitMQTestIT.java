@@ -94,7 +94,7 @@ public class RabbitMQTestIT {
                 "Sent and received messages should be equal");
     }
 
-    @Test
+//    @Test
     public void receiveFanoutMessage() throws MalformedURLException, URISyntaxException {
         OutputConfiguration outputConfiguration = getOutputConfiguration();
         outputConfiguration.getBasicConfig().setReceiverType(ReceiverType.EXCHANGE);
@@ -131,7 +131,7 @@ public class RabbitMQTestIT {
                 "Sent and received messages should be equal");
     }
 
-    @Test
+//    @Test
     public void receiveDirectMessage() throws MalformedURLException, URISyntaxException {
         OutputConfiguration outputConfiguration = getOutputConfiguration();
         outputConfiguration.getBasicConfig().setReceiverType(ReceiverType.EXCHANGE);
