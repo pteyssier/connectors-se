@@ -1,4 +1,7 @@
+def branchName = env.BRANCH_NAME
+def escapedBranch = branchName.toLowerCase().replaceAll("/","_")
 def slackChannel = 'components-ci'
+def m2 = "/tmp/jenkins/tdi/m2/${escapedBranch}"
 
 pipeline {
     agent {
@@ -20,6 +23,9 @@ spec:
         -
             name: docker
             hostPath: {path: /var/run/docker.sock}
+        -
+            name: m2main
+            hostPath: { path: ${m2} }
 """
         }
     }
