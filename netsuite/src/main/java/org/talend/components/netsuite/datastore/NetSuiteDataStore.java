@@ -12,8 +12,8 @@
  */
 package org.talend.components.netsuite.datastore;
 
-import java.io.Serializable;
-
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.talend.components.netsuite.service.UIActionService;
 import org.talend.sdk.component.api.configuration.Option;
 import org.talend.sdk.component.api.configuration.action.Checkable;
@@ -28,8 +28,7 @@ import org.talend.sdk.component.api.configuration.ui.layout.GridLayouts;
 import org.talend.sdk.component.api.configuration.ui.widget.Credential;
 import org.talend.sdk.component.api.meta.Documentation;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import java.io.Serializable;
 
 @Data
 @DataStore("NetSuiteConnection")
