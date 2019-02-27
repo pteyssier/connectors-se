@@ -41,7 +41,7 @@ spec:
     }
 
     stages {
-        stage('Perform Release') {
+        stage('Check branch and params'){
             steps {
                 script {
                     if (env.BRANCH_NAME != "master" || !env.BRANCH_NAME.startWith("maintenance/")) {
@@ -54,6 +54,8 @@ spec:
                     }
                 }
             }
+        }
+        stage('Perform Release') {
             steps {
                 container('main') {
                     withCredentials([
