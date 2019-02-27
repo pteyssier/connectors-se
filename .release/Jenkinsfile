@@ -75,7 +75,7 @@ spec:
                                     usernameVariable: 'NEXUS_USER',
                                     passwordVariable: 'NEXUS_PASSWORD')
                     ]) {
-                        sh "cd ci_nexus && mvn -e -U -B -s .jenkins/settings.xml clean deploy scm:tag scm:branch -DpushChanges=false -Drevision=${params.RELEASE_VERSION} -Dmaintenance=${params.MAINTENANCE_VERSION}"
+                        sh "mvn -e -U -B -s .jenkins/settings.xml clean deploy scm:tag scm:branch -DpushChanges=false -Drevision=${params.RELEASE_VERSION} -Dmaintenance=${params.MAINTENANCE_VERSION} -DskipTests"
                     }
                 }
             }
