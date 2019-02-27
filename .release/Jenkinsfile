@@ -54,9 +54,9 @@ spec:
                 container('main') {
                     script {
                         if ("akhabali/release-project".equalsIgnoreCase(env.BRANCH_NAME) || "master".equalsIgnoreCase(env.BRANCH_NAME) || env.BRANCH_NAME.startsWith("maintenance/")) {
-                            if (parameters.RELEASE_VERSION.isEmpty() || params.MAINTENANCE_VERSION.isEmpty()) {
+                            if (params.RELEASE_VERSION.isEmpty() || params.MAINTENANCE_VERSION.isEmpty()) {
                                 currentBuild.result = 'ABORTED'
-                                error(' RELEASE_VERSION and MAINTENANCE_VERSION can\'t be empty' + env.BRANCH_NAME)
+                                error(' RELEASE_VERSION and MAINTENANCE_VERSION can\'t be empty')
                             }
                         } else {
                             currentBuild.result = 'ABORTED'
