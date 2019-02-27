@@ -54,7 +54,7 @@ spec:
                 container('main') {
                     script {
 
-                        if (env.BRANCH_NAME != "akhabali/release-project" || env.BRANCH_NAME != "master" || !env.BRANCH_NAME.startWith("maintenance/")) {
+                        if (!"akhabali/release-project".equalsIgnoreCase(env.BRANCH_NAME) || "master".equalsIgnoreCase(env.BRANCH_NAME) || !env.BRANCH_NAME.startWith("maintenance/")) {
                             currentBuild.result = 'ABORTED'
                             error('You can only release from a master or maintenance branch. the branch was : ' + env.BRANCH_NAME)
                         }
