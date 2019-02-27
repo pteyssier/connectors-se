@@ -1,5 +1,5 @@
 def branchName = env.BRANCH_NAME
-def escapedBranch = branchName.toLowerCase().replaceAll("/","_")
+def escapedBranch = branchName.toLowerCase().replaceAll("/", "_")
 def slackChannel = 'components-ci'
 def m2 = "/tmp/jenkins/tdi/m2/${escapedBranch}"
 
@@ -49,18 +49,18 @@ spec:
     triggers { pollSCM('0 5 31 2 *') }
 
     stages {
-        stage('Check branch and params'){
+        stage('Check branch and release params') {
             steps {
                 container('main') {
                     script {
-
-                        if ((!"akhabali/release-project".equalsIgnoreCase(env.BRANCH_NAME) || !"master".equalsIgnoreCase(env.BRANCH_NAME)) && !env.BRANCH_NAME.startsWith("maintenance/")) {
+                        if ("akhabali/release-project".equalsIgnoreCase(env.BRANCH_NAME) || "master".equalsIgnoreCase(env.BRANCH_NAME) || env.BRANCH_NAME.startsWith("maintenance/")) {
+                            if (parameters.RELEASE_VERSION.isEmpty() || params.MAINTENANCE_VERSION.isEmpty()) {
+                                currentBuild.result = 'ABORTED'
+                                error(' RELEASE_VERSION and MAINTENANCE_VERSION can\'t be empty' + env.BRANCH_NAME)
+                            }
+                        } else {
                             currentBuild.result = 'ABORTED'
                             error('You can only release from a master or maintenance branch. the branch was : ' + env.BRANCH_NAME)
-                        }
-                        if (parameters.RELEASE_VERSION.isEmpty() || params.MAINTENANCE_VERSION.isEmpty()) {
-                            currentBuild.result = 'ABORTED'
-                            error(' RELEASE_VERSION and MAINTENANCE_VERSION can\'t be empty' + env.BRANCH_NAME)
                         }
                     }
                 }
