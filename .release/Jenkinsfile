@@ -43,14 +43,16 @@ spec:
     stages {
         stage('Check branch and params'){
             steps {
-                script {
-                    if (env.BRANCH_NAME != "master" || !env.BRANCH_NAME.startWith("maintenance/")) {
-                        currentBuild.result = 'ABORTED'
-                        error('You can only release from a master or maintenance branch. the branch was : ' + env.BRANCH_NAME)
-                    }
-                    if (parameters.RELEASE_VERSION.isEmpty() || params.MAINTENANCE_VERSION.isEmpty()) {
-                        currentBuild.result = 'ABORTED'
-                        error(' RELEASE_VERSION and MAINTENANCE_VERSION can\'t be empty' + env.BRANCH_NAME)
+                container('main') {
+                    script {
+                        if (env.BRANCH_NAME != "master" || !env.BRANCH_NAME.startWith("maintenance/")) {
+                            currentBuild.result = 'ABORTED'
+                            error('You can only release from a master or maintenance branch. the branch was : ' + env.BRANCH_NAME)
+                        }
+                        if (parameters.RELEASE_VERSION.isEmpty() || params.MAINTENANCE_VERSION.isEmpty()) {
+                            currentBuild.result = 'ABORTED'
+                            error(' RELEASE_VERSION and MAINTENANCE_VERSION can\'t be empty' + env.BRANCH_NAME)
+                        }
                     }
                 }
             }
