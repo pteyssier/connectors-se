@@ -75,12 +75,12 @@ spec:
                                     usernameVariable: 'NEXUS_USER',
                                     passwordVariable: 'NEXUS_PASSWORD')
                     ]) {
-                        sh "mvn -e -U -B -s .jenkins/settings.xml clean test -DskipTests"
+                        sh "mvn -e -U -B -s .jenkins/settings.xml clean install -DskipTests"
                     }
                 }
             }
         }
-        stage('Release Clean and Prepare') {
+        stage('Release prepare') {
             steps {
                 container('main') {
                     withCredentials([
@@ -89,12 +89,12 @@ spec:
                                     usernameVariable: 'NEXUS_USER',
                                     passwordVariable: 'NEXUS_PASSWORD')
                     ]) {
-                        sh "mvn -e -U -B -s .jenkins/settings.xml release:clean release:prepare -DskipTests"
+                        sh "mvn -e -U -B -s .jenkins/settings.xml release:clean release:prepare -Darguments=\"-DskipTests\""
                     }
                 }
             }
         }
-        stage('Release Perform') {
+        stage('Release perform') {
             steps {
                 container('main') {
                     withCredentials([
@@ -103,7 +103,7 @@ spec:
                                     usernameVariable: 'NEXUS_USER',
                                     passwordVariable: 'NEXUS_PASSWORD')
                     ]) {
-                        sh "mvn -e -U -B -s .jenkins/settings.xml release:perform -DskipTests"
+                        sh "mvn -e -U -B -s .jenkins/settings.xml release:perform -Darguments=\"-DskipTests\""
                     }
                 }
             }
