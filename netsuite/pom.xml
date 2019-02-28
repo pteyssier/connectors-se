@@ -147,6 +147,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+        <!--<version></version>-->
         <configuration>
           <excludePackageNames>com.netsuite.webservices.*</excludePackageNames>
         </configuration>

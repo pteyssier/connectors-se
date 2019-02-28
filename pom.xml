@@ -47,12 +47,12 @@
   </scm>
   <distributionManagement>
     <snapshotRepository>
-      <id>talend.snapshots</id>
-      <url>https://artifacts-zl.talend.com/nexus/content/repositories/snapshots/</url>
+      <id>talend_nexus_deployment</id>
+      <url>${talend_oss_snapshots}</url>
     </snapshotRepository>
     <repository>
-      <id>talend.releases</id>
-      <url>https://artifacts-zl.talend.com/nexus/content/repositories/releases/</url>
+      <id>talend_nexus_deployment</id>
+      <url>https://artifacts-zl.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
     </repository>
     <site>
       <id>documentation.website</id>
@@ -72,7 +72,7 @@
     <jackson-codehaus.version>1.9.14-TALEND</jackson-codehaus.version>
 
     <tcomp0.version>0.23.2</tcomp0.version> <!-- until they are rewritten -->
-    <daikon.version>0.23.0</daikon.version>
+    <daikon.version>0.31.0</daikon.version>
 
     <junit5.version>5.3.1</junit5.version>
 
@@ -83,6 +83,7 @@
     <guava.version>20.0</guava.version>
 
     <validation.model>true</validation.model>
+    <talend_oss_snapshots>https://artifacts-zl.talend.com/nexus/content/repositories/TalendOpenSourceSnapshot/</talend_oss_snapshots>
   </properties>
 
   <dependencyManagement>
@@ -240,8 +241,24 @@
 
   <repositories>
     <repository>
+      <id>talend.oss.snapshots</id>
+      <url>${talend_oss_snapshots}</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
       <id>TalendOpenSourceRelease</id>
       <url>https://artifacts-zl.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
     <repository>
       <id>SonatypeSnapshotsOSS</id>
@@ -256,8 +273,24 @@
   </repositories>
   <pluginRepositories>
     <pluginRepository>
-      <id>TalendOpenSourceRelease</id>
+      <id>talend.oss.snapshots</id>
+      <url>${talend_oss_snapshots}</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+    <pluginRepository>
+      <id>talend.oss.releases</id>
       <url>https://artifacts-zl.talend.com/nexus/content/repositories/TalendOpenSourceRelease/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </pluginRepository>
     <pluginRepository>
       <id>SonatypeSnapshotsOSS</id>
@@ -412,6 +445,11 @@
             <groupId>org.talend.sdk.component</groupId>
             <artifactId>component-runtime-beam</artifactId>
             <version>${component-runtime.version}</version>
+          </dependency>
+          <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-mapper-asl</artifactId>
+            <version>${jackson-codehaus.version}</version>
           </dependency>
         </dependencies>
       </plugin>
