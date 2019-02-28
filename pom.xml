@@ -63,6 +63,7 @@
         <!-- mvn clean deploy scm:tag scm:branch -DpushChanges=true -Drevision=$RELEASE_VERSION -Dmaintenance=$MAINTENANCE_VERSION  -->
         <maintenance>${project.version}</maintenance>
         <branch>maintenance/${maintenance}</branch>
+        <tag>release/${project.version}</tag>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <component-api.version>1.1.4</component-api.version>
